@@ -53,3 +53,10 @@ export async function getMarketSnapshot() {
   for (const [sym, sector] of STOCKS) stocks.push(await safe(sym, sym, sector, getStockQuote(sym)));
   return { yields, indices, fx, commodities, stocks, generatedAt: new Date().toISOString() };
 }
+
+/** Just the stock tickers (Sentiment watchlist). Cached for 10 minutes per ticker. */
+export async function getStocks() {
+  const out: Row<Quote>[] = [];
+  for (const [sym, sector] of STOCKS) out.push(await safe(sym, sym, sector, getStockQuote(sym)));
+  return out;
+}

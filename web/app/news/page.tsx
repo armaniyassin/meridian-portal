@@ -1,7 +1,8 @@
-import ComingSoon from "@/components/ComingSoon";
+import NewsView from "@/components/pages/NewsView";
+import DisclaimerFooter from "@/components/DisclaimerFooter";
 
-export const metadata = { title: "News and insights | Meridian" };
+export const metadata = { title: "News and insights | Meridian", description: "Plain-language explainers on bonds, equities, currencies and macro, with a live headline feed coming soon." };
 
 export default function Page() {
-  return <ComingSoon title="News and insights" text="Market stories that matter, balanced between positive and negative, and removed after two weeks." />;
+  return (<><NewsView /><DisclaimerFooter /></>);
 }

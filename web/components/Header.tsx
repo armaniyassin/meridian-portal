@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NavLinks from "@/components/NavLinks";
 import ThemeToggle from "@/components/ThemeToggle";
+import SignInButton from "@/components/SignInButton";
 
 export default function Header() {
   return (
@@ -15,6 +16,7 @@ export default function Header() {
         <NavLinks />
         <div className="right">
           <ThemeToggle />
+          <SignInButton />
           <Link className="b solid hide-s" href="/brief">Join the brief</Link>
         </div>
       </div>

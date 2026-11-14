@@ -1,7 +1,11 @@
 import "./globals.css";
+import "./pages.css";
 import type { Metadata } from "next";
 import { Inter_Tight, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
+import PageEffects from "@/components/PageEffects";
+import Popups from "@/components/Popups";
+import Toaster from "@/components/Toaster";
 import { HUB_COUNT_WORD } from "@/lib/hubs";
 
 const sans = Inter_Tight({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -23,6 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a className="skip" href="#main">Skip to content</a>
         <Header />
         <main id="main" tabIndex={-1}>{children}</main>
+        <PageEffects />
+        <Popups />
+        <Toaster />
       </body>
     </html>
   );
