@@ -6,7 +6,7 @@ import Vis from "@/components/Vis";
 
 export function InsightCard({ id, cat, read, v, t, lede }: { id: string; cat: string; read: number; v: string; t: string; lede: string }) {
   return (
-    <Link className="ncard rv" href={`/academy/insights/${id}`}>
+    <Link className="ncard rv" href={`/insights/${id}`}>
       <Vis k={v} />
       <div className="tb"><span className="tcat">{cat}</span><h3>{t}</h3><p>{lede}</p><span className="meta">{read} min read</span></div>
     </Link>
@@ -25,11 +25,12 @@ export default function Insights() {
   const list = ARTICLES.filter((a) => cat === "All" || a.cat === cat);
   const Q = QUOTES[q];
   return (
+    <div className="wrap pg">
     <section id="insights" aria-labelledby="insights-h">
       <div className="pg-h">
         <div className="eyebrow">Insights</div>
         <h1 id="insights-h" className="two fx">Understand it first. <span className="dim">Then study it.</span></h1>
-        <p className="lede">Short, plain-language explainers on how finance and trading work, and words from great investors. A good place to start before the lessons.</p>
+        <p className="lede">Short, plain-language explainers on how finance and trading work, and words from great investors. A good place to start before the Academy lessons.</p>
       </div>
       <div className="sh rv">
         <h2 style={{ fontSize: 22 }}>Explainers</h2>
@@ -44,5 +45,6 @@ export default function Insights() {
         <div className="qdots">{QUOTES.map((_, i) => <button key={i} type="button" aria-label={`Quote ${i + 1}`} aria-current={i === q} onClick={() => setQ(i)} />)}</div>
       </div>
     </section>
+    </div>
   );
 }

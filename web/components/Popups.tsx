@@ -12,7 +12,7 @@ const ss = { get: (k: string) => { try { return sessionStorage.getItem(k); } cat
 /** Two gentle, dismissible pop-ups: a tip after one minute, and a reading list after a long scroll on the home page. Each shows once per visit and closes itself after 20 s. */
 export default function Popups() {
   const path = usePathname();
-  const quiet = path === "/brief" || path.startsWith("/academy/insights/");
+  const quiet = path === "/brief" || path.startsWith("/insights/");
   const [tip, setTip] = useState(false), [news, setNews] = useState(false);
   const [i, setI] = useState(0);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
@@ -56,7 +56,7 @@ export default function Popups() {
             <button type="button" aria-label="Previous tip" onClick={() => setI((i + TIPS.length - 1) % TIPS.length)}>‹</button>
             <button type="button" aria-label="Next tip" onClick={() => setI((i + 1) % TIPS.length)}>›</button>
           </div>
-          {T.a && <Link className="plink" href={`/academy/insights/${T.a}`} onClick={() => setTip(false)}>Read more</Link>}
+          {T.a && <Link className="plink" href={`/insights/${T.a}`} onClick={() => setTip(false)}>Read more</Link>}
           <Link className="b solid sm" href="/brief" onClick={() => setTip(false)}>Join the brief</Link>
         </div>
       </div>
@@ -65,9 +65,9 @@ export default function Popups() {
         <button className="x" type="button" aria-label="Close" onClick={() => setNews(false)}>×</button>
         <div className="ph"><span className="tcat">Worth reading</span></div>
         {stories.map((a) => (
-          <Link key={a.id} className="nitem" href={`/academy/insights/${a.id}`} onClick={() => setNews(false)}><span className="tcat">{a.cat} · Insight</span><b>{a.t}</b></Link>
+          <Link key={a.id} className="nitem" href={`/insights/${a.id}`} onClick={() => setNews(false)}><span className="tcat">{a.cat} · Insight</span><b>{a.t}</b></Link>
         ))}
-        <div className="prow"><Link className="b solid sm" href="/academy#insights" onClick={() => setNews(false)}>Open the insights</Link><Link className="plink" href="/brief" onClick={() => setNews(false)}>Join the brief</Link></div>
+        <div className="prow"><Link className="b solid sm" href="/insights" onClick={() => setNews(false)}>Open the insights</Link><Link className="plink" href="/brief" onClick={() => setNews(false)}>Join the brief</Link></div>
       </div>
     </div>
   );

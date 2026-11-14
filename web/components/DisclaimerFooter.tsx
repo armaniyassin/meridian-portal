@@ -14,7 +14,7 @@ export default function DisclaimerFooter() {
             <p style={{ fontSize: 13, color: "var(--muted)", maxWidth: "30ch" }}>Global markets, sentiment and education in one place.</p>
           </div>
           <nav aria-label="Product"><h2>Product</h2><Link href="/markets">Markets</Link><Link href="/sentiment">Sentiment</Link><Link href="/academy">Academy</Link><Link href="/news">News</Link></nav>
-          <div><h2>Resources</h2><Link href="/brief">Weekly brief</Link><span className="soon">Data sources · Coming soon</span></div>
+          <div><h2>Resources</h2><Link href="/insights">Insights</Link><Link href="/brief">Weekly brief</Link><span className="soon">Data sources · Coming soon</span></div>
           <div><h2>Legal</h2><span className="soon">Privacy policy · Coming soon</span><span className="soon">Terms of service · Coming soon</span></div>
         </div>
         <div className="legal">
