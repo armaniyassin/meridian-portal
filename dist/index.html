@@ -971,7 +971,7 @@ const toast = (()=>{let t; return m=>{const el=$('#toast'); el.textContent=m; el
 const ARROW='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
 /* ================= state ================= */
-let current='lon', page=null, mtab='overview', range='day', tzMode='utc', quota=5, sortKey='ticker', secIdx=0, animChart=true, lastRun=null;
+let current='lon', page=null, target=null, mtab='overview', range='day', tzMode='utc', quota=5, sortKey='ticker', secIdx=0, animChart=true, lastRun=null;
 const rowsT=[['AAPL','Technology'],['MSFT','Technology'],['NVDA','Technology'],['AMZN','Consumer Discretionary'],['TSLA','Consumer Discretionary'],['JPM','Financials'],['XOM','Energy'],['JNJ','Health Care']].map(([t,s])=>({t,s,state:'idle'}));
 
 /* ================= globes ================= */
@@ -988,17 +988,21 @@ function drawHubInfo(){ const h=byId[current], nc=nextChange(h,Date.now());
 const PAGES=['home','markets','sentiment','academy','brief','news','article'];
 let artId=null;
 const TITLES={home:'Meridian Global Macro',markets:'Markets | Meridian',sentiment:'Sentiment | Meridian',academy:'Academy | Meridian',brief:'Weekly brief | Meridian',news:'News and insights | Meridian'};
-function route(){
-  const h=(location.hash||'').replace('#','');
+function route(hh){
+  const h=(typeof hh==='string'?hh:(location.hash||'')).replace('#','');
   if(h.startsWith('article-')){ const id=h.slice(8); if(artById(id)){ artId=id; show('article'); return; } }
   const p=(PAGES.includes(h)&&h!=='article')?h:'home';
   show(p);
 }
+let showTok=0;
 function show(p){
-  if(p===page && p!=='article') return;
+  /* target = what the user last asked for; page = what is on screen. Compare against the target so a click made mid-transition is never dropped. */
+  if(p===target && p!=='article') return;
+  target=p; const tok=++showTok;
   const prev=page?$('#p-'+page):null, next=$('#p-'+p);
   paintNav(p); $('#more').classList.remove('open'); $('#moreB').setAttribute('aria-expanded','false');
   const enter=()=>{
+    if(tok!==showTok) return; /* a newer navigation superseded this one */
     $$('.page').forEach(x=>{x.hidden=true; x.classList.remove('out','enter');});
     next.hidden=false; if(!REDUCE) next.classList.add('enter'); page=p; scrollTo(0,0);
     onShow(p);
@@ -1023,12 +1027,20 @@ function onShow(p){
   setupReveals(); applyFocus();
 }
 function refreshPage(){ if(typeof drawHeat==='function') drawHeat(); if(page==='markets') drawMarkets(false); if(page==='sentiment') drawSent(); }
-addEventListener('hashchange',route);
+addEventListener('hashchange',()=>route());
+/* Sandboxed hosts (e.g. an artifact viewer) can block or swallow hash navigation, so in-page links are routed directly. */
+document.addEventListener('click',e=>{
+  const a=e.target.closest&&e.target.closest('a[href^="#"]'); if(!a||e.defaultPrevented||e.button||e.metaKey||e.ctrlKey||e.shiftKey) return;
+  const h=a.getAttribute('href'); if(h.length<2) return;
+  e.preventDefault();
+  try{ history.replaceState(null,'',h); }catch(_){ try{ location.hash=h; }catch(__){} }
+  route(h);
+});
 
 /* More menu */
 $('#moreB').onclick=e=>{ e.stopPropagation(); const m=$('#more'); const o=m.classList.toggle('open'); $('#moreB').setAttribute('aria-expanded',o); };
 document.addEventListener('click',e=>{ if(!e.target.closest('#more')){ $('#more').classList.remove('open'); $('#moreB').setAttribute('aria-expanded','false'); } });
-$('#mmDisc').addEventListener('click',e=>{ e.preventDefault(); $('#more').classList.remove('open'); const go=()=>$('#disc').scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'center'}); if(page!=='home'){ location.hash='home'; setTimeout(go,700);} else go(); });
+$('#mmDisc').addEventListener('click',e=>{ e.preventDefault(); $('#more').classList.remove('open'); const go=()=>$('#disc').scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'center'}); if(page!=='home'){ try{history.replaceState(null,'','#home');}catch(_){} route('#home'); setTimeout(go,700);} else go(); });
 
 /* ================= scroll effects ================= */
 function setupReveals(){
@@ -1589,7 +1601,7 @@ function drawHeat(){ const h=$('#hmHome'); if(h) h.innerHTML=heatHTML(); if(mtab
 function tabHeat(){ return heatHTML(); }
 document.addEventListener('click',e=>{
   const v=e.target.closest('[data-hv]'); if(v){ hmView=v.dataset.hv; drawHeat(); return; }
-  const t=e.target.closest('.hmt'); if(t){ select(t.dataset.id,true); location.hash='#markets'; }
+  const t=e.target.closest('.hmt'); if(t){ select(t.dataset.id,true); try{history.replaceState(null,'','#markets');}catch(_){} route('#markets'); }
 });
 document.addEventListener('pointerover',e=>{ const t=e.target.closest&&e.target.closest('.hmt'); if(t){ const r=document.getElementById('hmRead'); if(r&&r.closest('.hmwrap, #mBody')) r.textContent=t.dataset.d; } });
 
