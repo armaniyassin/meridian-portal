@@ -2,8 +2,8 @@
 const root = document.documentElement;
 const isDark = () => root.dataset.theme ? root.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches;
 window.__pal = () => isDark()
-  ? {l:[226,234,246], n:[112,138,176], s:'150,176,214', limb1:'rgba(110,150,210,.14)', limb2:'rgba(150,185,235,.28)', labBg:'rgba(17,27,41,.92)', labLine:'#35506f', labFg:'#e8edf3'}
-  : {l:[38,62,100], n:[160,172,190], s:'80,100,130', limb1:'rgba(61,111,180,.06)', limb2:'rgba(61,111,180,.2)', labBg:'rgba(255,254,251,.96)', labLine:'#d6d2c6', labFg:'#1f2d3d'};
+  ? {l:[226,234,246], n:[112,138,176], s:'150,176,214', limb1:'rgba(110,150,210,.14)', limb2:'rgba(150,185,235,.28)', labBg:'rgba(17,27,41,.92)', labLine:'#35506f', labFg:'#e8edf3', mut:'#9aabbf', up:'#62bf9c'}
+  : {l:[38,62,100], n:[160,172,190], s:'80,100,130', limb1:'rgba(61,111,180,.06)', limb2:'rgba(61,111,180,.2)', labBg:'rgba(255,254,251,.96)', labLine:'#d6d2c6', labFg:'#1f2d3d', mut:'#667487', up:'#3f8f73'};
 function paintTheme(){ $('#thDark').setAttribute('aria-pressed',isDark()); $('#thLight').setAttribute('aria-pressed',!isDark()); }
 function setTheme(t){ root.dataset.theme=t; try{localStorage.setItem('mgm-theme',t);}catch(e){} paintTheme(); }
 try{ const s=localStorage.getItem('mgm-theme'); if(s) root.dataset.theme=s; }catch(e){}

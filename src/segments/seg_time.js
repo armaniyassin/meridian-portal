@@ -11,10 +11,12 @@ function isOpen(h, t){
   return p.min >= h.o && p.min < h.c;
 }
 function openCount(t){ return HUBS.reduce((n,h)=>n+(isOpen(h,t)?1:0),0); }
-function nextChange(h, t){ // minutes until the status flips, scanning in 5-minute steps
-  const s = isOpen(h,t);
-  for (let m=5; m<=60*24*5; m+=5){ if (isOpen(h,t+m*60000)!==s) return {open:s, mins:m}; }
-  return {open:s, mins:null};
+function nextChange(h, t){ // minutes until the status flips: coarse 5-min scan, then 1-min refinement
+  t=Math.floor(t/60000)*60000; const s = isOpen(h,t);
+  for (let m=5; m<=60*24*5; m+=5){ if (isOpen(h,t+m*60000)!==s){
+    for (let k=m-4; k<=m; k++){ if (isOpen(h,t+k*60000)!==s) return {open:s, mins:k, at:t+k*60000}; }
+    return {open:s, mins:m, at:t+m*60000}; } }
+  return {open:s, mins:null, at:null};
 }
 function human(m){ if(m==null) return ''; const d=Math.floor(m/1440), hh=Math.floor((m%1440)/60), mm=m%60;
   return (d?d+'d ':'') + (hh?hh+'h ':'') + (!d?mm+'m':'').trim(); }
