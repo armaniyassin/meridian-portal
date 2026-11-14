@@ -1,9 +1,27 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Nav from "@/components/Nav";
+import { Inter_Tight, Geist_Mono } from "next/font/google";
+import Header from "@/components/Header";
 
-export const metadata: Metadata = { title: "Meridian Global Macro", description: "Markets, sentiment and education in one place." };
+const sans = Inter_Tight({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+
+export const metadata: Metadata = {
+  title: "Meridian Global Macro",
+  description: "Bonds, currencies, indices and AI sentiment across eleven financial centres. Educational information only.",
+};
+
+// Runs before first paint so the saved theme never flashes.
+const themeScript = `try{var t=localStorage.getItem('mgm-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (<html lang="en"><body><Nav />{children}</body></html>);
+  return (
+    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+      <body>
+        <Header />
+        <main>{children}</main>
+      </body>
+    </html>
+  );
 }
