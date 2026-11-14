@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { HUBS, isOpen } from "@/lib/hubs";
+import { HUBS, HUB_COUNT_WORD, isOpen } from "@/lib/hubs";
 import { sessionSeries, type Range, type Zone } from "@/lib/sessions";
 
 const clock = (tz: string, t: number) => new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(t));
@@ -61,8 +61,8 @@ export default function Sessions() {
       </div>
       <div className="card">
         <h2 className="text-sm font-semibold">How to read this</h2>
-        <p className="note mt-2 text-[13.5px]">The line counts how many of the eleven exchanges are in their regular session at each hour. Sessions overlap when Europe closes and New York opens, and when Asia hands over to Europe.</p>
-        <p className="note mt-2 text-[13.5px]">Weekends show zero. Holidays are not included. This chart shows published trading hours, not prices.</p>
+        <p className="note mt-2 text-[13.5px]">The line counts how many of the {HUB_COUNT_WORD} exchanges are in their regular session at each hour. Sessions overlap when Europe closes and New York opens, and when Asia hands over to Europe.</p>
+        <p className="note mt-2 text-[13.5px]">Most exchanges are closed on Saturday and Sunday. Cairo trades Sunday to Thursday. Holidays are not included. This chart shows published trading hours, not prices.</p>
       </div>
       <ul className="grid gap-2 sm:grid-cols-2 md:col-span-2 lg:grid-cols-4">
         {HUBS.map((h) => { const o = isOpen(h, now); return (

@@ -1,7 +1,7 @@
 import type { Row } from "@/lib/markets";
 import type { FredPoint } from "@/lib/fred";
 import type { Quote } from "@/lib/fmp";
-import { HUBS, regionOf } from "@/lib/hubs";
+import { HUBS, REGIONS, regionOf } from "@/lib/hubs";
 
 /** Plain, serialisable shapes handed to the client tabs. */
 export type Item = {
@@ -14,7 +14,7 @@ export type Item = {
 };
 export type Strength = { code: string; name: string; chg: number | null; saved: boolean };
 export type MarketsData = {
-  generatedAt: string; yields: Item[]; vix: Item | null; indices: Item[]; fx: Item[]; strength: Strength[];
+  generatedAt: string; yields: Item[]; vix: Item | null; indices: Item[]; fx: Item[]; commodities: Item[]; strength: Strength[];
 };
 
 const AWAITING = "Awaiting feed";
@@ -38,9 +38,10 @@ const fredItem = (r: Row<FredPoint>): Item =>
 const CCY: [string, string, string | null][] = [
   ["EUR", "Euro", "EURUSD"], ["JPY", "Japanese yen", "USDJPY"], ["GBP", "British pound", "GBPUSD"], ["CHF", "Swiss franc", "USDCHF"],
   ["CAD", "Canadian dollar", "USDCAD"], ["AUD", "Australian dollar", "AUDUSD"], ["NZD", "New Zealand dollar", "NZDUSD"], ["CNY", "Chinese yuan", null],
+  ["ZAR", "South African rand", "USDZAR"], ["EGP", "Egyptian pound", "USDEGP"], ["NGN", "Nigerian naira", "USDNGN"], ["KES", "Kenyan shilling", "USDKES"],
 ];
 
-export function buildView(s: { yields: Row<FredPoint>[]; indices: Row<Quote>[]; fx: Row<Quote>[]; generatedAt: string }): MarketsData {
+export function buildView(s: { yields: Row<FredPoint>[]; indices: Row<Quote>[]; fx: Row<Quote>[]; commodities: Row<Quote>[]; generatedAt: string }): MarketsData {
   // Bonds: US Treasuries are live; the other countries are listed so the page matches the design, and read "Awaiting feed".
   const us = s.yields.filter((r) => r.symbol !== "VIXCLS").map(fredItem);
   const otherBonds: Item[] = HUBS.filter((h) => h.bsrc && h.id !== "nyc").map((h) => ({
@@ -53,7 +54,7 @@ export function buildView(s: { yields: Row<FredPoint>[]; indices: Row<Quote>[]; 
   const fetched = s.indices.map(quoteItem);
   const have = new Set(fetched.map((i) => i.label));
   const pending: Item[] = HUBS.filter((h) => !have.has(h.idx)).map((h) => ({ label: h.idx, group: regionOf(h), value: null, reason: AWAITING }));
-  const regionOrder = ["Americas", "Europe", "Asia-Pacific"];
+  const regionOrder: string[] = [...REGIONS];
   const indices = [...fetched, ...pending].sort((a, b) => regionOrder.indexOf(a.group) - regionOrder.indexOf(b.group));
 
   const fxHave = new Set(s.fx.map((r) => r.label));
@@ -70,5 +71,5 @@ export function buildView(s: { yields: Row<FredPoint>[]; indices: Row<Quote>[]; 
       return { code, name, chg: sym!.startsWith("USD") ? (100 / (100 + p) - 1) * 100 : p, saved: r.stale };
     })];
 
-  return { generatedAt: s.generatedAt, yields: [...us, ...otherBonds], vix: vixRow ? fredItem(vixRow) : null, indices, fx, strength };
+  return { generatedAt: s.generatedAt, yields: [...us, ...otherBonds], vix: vixRow ? fredItem(vixRow) : null, indices, fx, commodities: s.commodities.map(quoteItem), strength };
 }

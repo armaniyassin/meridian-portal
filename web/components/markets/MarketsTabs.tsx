@@ -1,14 +1,14 @@
 "use client";
 import { useRef, useState } from "react";
 import type { MarketsData } from "@/lib/markets-view";
-import { HUBS } from "@/lib/hubs";
+import { HUB_COUNT_WORD } from "@/lib/hubs";
 import Bars from "@/components/markets/Bars";
 import StrengthGrid from "@/components/markets/Strength";
 import OptionsGauge, { type OptionsData } from "@/components/markets/OptionsGauge";
 import Heat from "@/components/markets/Heat";
 import Sessions from "@/components/markets/Sessions";
 
-const TABS = [["overview", "Overview"], ["bonds", "Bonds"], ["indices", "Indices"], ["currencies", "Currencies"], ["stocks", "Stocks"], ["options", "Options"], ["heatmap", "Heatmap"], ["sessions", "Sessions"]] as const;
+const TABS = [["overview", "Overview"], ["bonds", "Bonds"], ["indices", "Indices"], ["currencies", "Currencies"], ["commodities", "Commodities"], ["stocks", "Stocks"], ["options", "Options"], ["heatmap", "Heatmap"], ["sessions", "Sessions"]] as const;
 type Tab = (typeof TABS)[number][0];
 const NO_OPTIONS: OptionsData = { overall: null };
 const STOCKS = [["AAPL", "Technology"], ["MSFT", "Technology"], ["NVDA", "Technology"], ["AMZN", "Consumer Discretionary"], ["TSLA", "Consumer Discretionary"], ["JPM", "Financials"], ["XOM", "Energy"], ["JNJ", "Health Care"]];
@@ -49,6 +49,7 @@ export default function MarketsTabs({ data }: { data: MarketsData }) {
     </Panel>
   );
   const indices = <Panel title="Indices" sub="Daily change of benchmark indices, by region" source="FMP"><Bars items={data.indices} mode="chg" /></Panel>;
+  const commodities = <Panel title="Commodities" sub="Metals and energy, daily change in US dollars" source="FMP"><Bars items={data.commodities} mode="chg" decimals={2} /></Panel>;
   const stocks = (
     <Panel title="Stocks" sub="The tickers in Sentiment, grouped by sector" source="FMP · Finnhub">
       <ul>{STOCKS.map(([t, sec]) => (<li key={t} className="flex items-center justify-between py-1.5 text-sm"><span><b className="font-mono">{t}</b> <span className="text-xs text-muted">{sec}</span></span><span className="text-xs text-muted">Awaiting feed</span></li>))}</ul>
@@ -73,7 +74,7 @@ export default function MarketsTabs({ data }: { data: MarketsData }) {
       </div>
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} tabIndex={0} className="mt-6 outline-offset-4">
         {tab === "overview" && (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{bonds}{indices}{stocks}{fx}{strength}<div className="md:col-span-2 xl:col-span-3">{options}</div></div>
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{bonds}{indices}{commodities}{stocks}{fx}{strength}<div className="md:col-span-2 xl:col-span-3">{options}</div></div>
         )}
         {tab === "bonds" && (
           <div className="space-y-5">{bonds}
@@ -93,6 +94,7 @@ export default function MarketsTabs({ data }: { data: MarketsData }) {
         )}
         {tab === "indices" && <div className="space-y-5">{indices}<p className="note">A few indices need a paid data plan and show as unavailable instead of an estimate.</p></div>}
         {tab === "currencies" && <div className="space-y-5">{strength}{fx}</div>}
+        {tab === "commodities" && <div className="space-y-5">{commodities}<p className="note">Gold, silver, platinum and copper are metals. Oil and gas are energy. Prices are futures-style benchmark quotes. Any the data plan does not cover show as unavailable instead of an estimate.</p></div>}
         {tab === "stocks" && stocks}
         {tab === "options" && (
           <div className="space-y-5">{options}
@@ -103,7 +105,7 @@ export default function MarketsTabs({ data }: { data: MarketsData }) {
             </section>
           </div>
         )}
-        {tab === "heatmap" && <Panel title="Heatmap" sub="A visual overview of the eleven centres" source="FMP"><Heat indices={data.indices} fx={data.fx} yields={data.yields} /></Panel>}
+        {tab === "heatmap" && <Panel title="Heatmap" sub={`A visual overview of the ${HUB_COUNT_WORD} centres`} source="FMP"><Heat indices={data.indices} fx={data.fx} yields={data.yields} commodities={data.commodities} /></Panel>}
         {tab === "sessions" && <Sessions />}
       </div>
     </div>

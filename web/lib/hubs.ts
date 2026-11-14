@@ -1,5 +1,5 @@
 export type Hub = {
-  id: string; key?: number; name: string; ex: string; lat: number; lon: number; tz: string;
+  id: string; key?: number; off?: string[]; name: string; ex: string; lat: number; lon: number; tz: string;
   o: number; c: number; /* regular session, local minutes since midnight */
   idx: string; bond: string; bsrc: string; fx: string;
 };
@@ -16,7 +16,11 @@ export const HUBS: Hub[] = [
  {id:'hkg', key:1, name:'Hong Kong', ex:'HKEX', lat:22.32, lon:114.17, tz:'Asia/Hong_Kong', o:570, c:960, idx:'Hang Seng', bond:'Not covered', bsrc:'', fx:'USD/HKD'},
  {id:'sha', key:1, name:'Shanghai', ex:'SSE', lat:31.23, lon:121.47, tz:'Asia/Shanghai', o:570, c:900, idx:'SSE Composite', bond:'China 10-year', bsrc:'FMP', fx:'USD/CNY'},
  {id:'tyo', key:1, name:'Tokyo', ex:'TSE', lat:35.68, lon:139.69, tz:'Asia/Tokyo', o:540, c:930, idx:'Nikkei 225', bond:'Japan 10-year JGB', bsrc:'FMP', fx:'USD/JPY'},
- {id:'syd', name:'Sydney', ex:'ASX', lat:-33.87, lon:151.21, tz:'Australia/Sydney', o:600, c:960, idx:'ASX 200', bond:'Australia 10-year', bsrc:'FMP', fx:'AUD/USD'}
+ {id:'syd', name:'Sydney', ex:'ASX', lat:-33.87, lon:151.21, tz:'Australia/Sydney', o:600, c:960, idx:'ASX 200', bond:'Australia 10-year', bsrc:'FMP', fx:'AUD/USD'},
+ {id:'jnb', key:1, name:'Johannesburg', ex:'JSE', lat:-26.20, lon:28.05, tz:'Africa/Johannesburg', o:540, c:1020, idx:'JSE Top 40', bond:'South Africa 10-year', bsrc:'FMP', fx:'USD/ZAR'},
+ {id:'cai', key:1, off:['Fri','Sat'], name:'Cairo', ex:'EGX', lat:30.04, lon:31.24, tz:'Africa/Cairo', o:600, c:870, idx:'EGX 30', bond:'Not covered', bsrc:'', fx:'USD/EGP'},
+ {id:'los', key:1, name:'Lagos', ex:'NGX', lat:6.52, lon:3.38, tz:'Africa/Lagos', o:570, c:870, idx:'NGX All-Share', bond:'Not covered', bsrc:'', fx:'USD/NGN'},
+ {id:'nbo', key:1, name:'Nairobi', ex:'NSE', lat:-1.29, lon:36.82, tz:'Africa/Nairobi', o:540, c:900, idx:'NSE 20', bond:'Not covered', bsrc:'', fx:'USD/KES'},
 ];
 
 export const HUBS_BY_ID: Record<string, Hub> = Object.fromEntries(HUBS.map((h) => [h.id, h]));
@@ -31,7 +35,7 @@ function parts(tz: string, t: number) {
 
 export function isOpen(h: Hub, t: number): boolean {
   const p = parts(h.tz, t);
-  if (p.wd === "Sat" || p.wd === "Sun") return false;
+  if ((h.off ?? ["Sat", "Sun"]).includes(p.wd)) return false;
   return p.min >= h.o && p.min < h.c;
 }
 
@@ -56,4 +60,8 @@ export function humanMinutes(m: number | null): string {
 }
 export const pad = (n: number) => String(n).padStart(2, "0");
 
-export const regionOf = (h: Hub) => (h.tz.startsWith("America") ? "Americas" : h.tz.startsWith("Europe") ? "Europe" : "Asia-Pacific");
+export const REGIONS = ["Americas", "Europe", "Africa", "Asia-Pacific"] as const;
+export const regionOf = (h: Hub): string => (h.tz.startsWith("America") ? "Americas" : h.tz.startsWith("Europe") ? "Europe" : h.tz.startsWith("Africa") ? "Africa" : "Asia-Pacific");
+const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+/** Number of centres in words, so copy never goes stale when a hub is added. */
+export const HUB_COUNT_WORD = WORDS[HUBS.length] ?? String(HUBS.length);

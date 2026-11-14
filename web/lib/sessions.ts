@@ -1,4 +1,4 @@
-import { HUBS, isOpen } from "@/lib/hubs";
+import { HUBS, HUB_COUNT_WORD, isOpen } from "@/lib/hubs";
 
 export type Range = "day" | "week";
 export type Zone = "utc" | "local";
@@ -38,7 +38,7 @@ export function sessionSeries(now: number, range: Range, zone: Zone): Series {
       const day = dfmt.format(new Date(st + i * 86400000));
       out.vals.push(tot); out.desc.push(`${day}: ${tot} exchange-hours of trading`); out.axis.push(day.split(" ")[0]);
     }
-    out.nowIdx = 0; out.sub = "Next 7 days, summed over eleven exchanges (UTC days)";
+    out.nowIdx = 0; out.sub = `Next 7 days, summed over ${HUB_COUNT_WORD} exchanges (UTC days)`;
   }
   return out;
 }

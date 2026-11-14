@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HUB_COUNT_WORD } from "@/lib/hubs";
 import GlobeStage from "@/components/home/GlobeStage";
 
 const ARROW = (
@@ -16,7 +17,7 @@ export default function Hero() {
         </svg>
         <h1>Meridian</h1>
         <p className="tagline">Institutional grade, made accessible.</p>
-        <p className="sub">Meridian follows bonds, currencies, indices and AI sentiment across eleven financial centres, and shows who is trading right now.</p>
+        <p className="sub">Meridian follows bonds, currencies, indices and AI sentiment across {HUB_COUNT_WORD} financial centres, and shows who is trading right now.</p>
         <div className="cta">
           <Link className="b solid lg" href="/markets">Explore markets {ARROW}</Link>
           <Link className="b lg" href="/brief">Get the weekly brief</Link>

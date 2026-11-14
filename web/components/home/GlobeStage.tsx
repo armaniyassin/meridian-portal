@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HUBS, HUBS_BY_ID, nextChange, humanMinutes } from "@/lib/hubs";
+import { HUBS, HUBS_BY_ID, HUB_COUNT_WORD, nextChange, humanMinutes } from "@/lib/hubs";
 
 declare global { interface Window { __pal?: () => unknown; __sans?: string } }
 type GlobeLike = { active: string | null; focus: (lon: number, lat: number) => void; frame: (t: number) => void };
@@ -73,7 +73,7 @@ export default function GlobeStage() {
   return (
     <>
       <div className="gcanvas">
-        <canvas ref={canvas} role="img" aria-label="Interactive globe of eleven financial centres. Drag to rotate, or select a marker to see its status." />
+        <canvas ref={canvas} role="img" aria-label={`Interactive globe of ${HUB_COUNT_WORD} financial centres. Drag to rotate, or select a marker to see its status.`} />
       </div>
       <div className="hubbar">
         <div className="hubnav" aria-live="polite">

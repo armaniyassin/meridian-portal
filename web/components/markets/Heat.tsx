@@ -1,18 +1,18 @@
 "use client";
 import { useState } from "react";
-import { HUBS, regionOf } from "@/lib/hubs";
+import { HUBS, REGIONS, HUB_COUNT_WORD, regionOf } from "@/lib/hubs";
 import { squarify } from "@/lib/treemap";
 import type { Item } from "@/lib/markets-view";
 
-type View = "idx" | "fx" | "bond";
-const VIEWS: [View, string][] = [["idx", "Indices"], ["fx", "Currencies"], ["bond", "Bonds"]];
+type View = "idx" | "fx" | "bond" | "com";
+const VIEWS: [View, string][] = [["idx", "Indices"], ["fx", "Currencies"], ["bond", "Bonds"], ["com", "Commodities"]];
 const W = 1000, H = 520, G = 26;
 
 type Tile = { name: string; sub: string; reg: string; v: number | null; level?: string; w: number };
 const sign = (v: number) => `${v > 0 ? "▲ +" : v < 0 ? "▼ " : "■ "}${v.toFixed(2)}%`;
 
 /** Finviz-style treemap. Tiles are equal-sized until market-cap weights exist. Shade shows the size of the move; the arrow and sign carry direction. */
-export default function Heat({ indices, fx, yields }: { indices: Item[]; fx: Item[]; yields: Item[] }) {
+export default function Heat({ indices, fx, yields, commodities }: { indices: Item[]; fx: Item[]; yields: Item[]; commodities: Item[] }) {
   const [view, setView] = useState<View>("idx");
   const byLabel = (list: Item[], l: string) => list.find((i) => i.label === l);
 
@@ -20,12 +20,15 @@ export default function Heat({ indices, fx, yields }: { indices: Item[]; fx: Ite
     ? HUBS.map((h) => ({ name: h.idx, sub: h.name, reg: regionOf(h), v: byLabel(indices, h.idx)?.value ?? null, w: 1 }))
     : view === "fx"
       ? [...new Set(HUBS.map((h) => h.fx))].map((p) => { const h = HUBS.find((x) => x.fx === p)!; return { name: p, sub: h.name, reg: regionOf(h), v: byLabel(fx, p)?.value ?? null, w: 1 }; })
-      : HUBS.filter((h) => h.bsrc).map((h) => {
+      : view === "com"
+        ? commodities.map((c) => ({ name: c.label, sub: c.group ?? "", reg: c.group ?? "Other", v: c.value, w: 1 }))
+        : HUBS.filter((h) => h.bsrc).map((h) => {
           const us = h.id === "nyc" ? yields.find((y) => y.label === "US 10-year Treasury") : undefined;
           return { name: h.bond.replace(" 10-year", "").replace(" gilt", ""), sub: "10-year · " + h.name, reg: regionOf(h), v: null, level: us?.value != null ? `${us.value.toFixed(2)}%` : undefined, w: 1 };
         });
 
-  const regs = ["Americas", "Europe", "Asia-Pacific"].map((r) => ({ r, w: tiles.filter((t) => t.reg === r).reduce((s, t) => s + t.w, 0) })).filter((g) => g.w > 0);
+  const order: string[] = view === "com" ? ["Metals", "Energy"] : [...REGIONS];
+  const regs = order.map((r) => ({ r, w: tiles.filter((t) => t.reg === r).reduce((s, t) => s + t.w, 0) })).filter((g) => g.w > 0);
   const groups = squarify(regs, 0, 0, W, H);
 
   return (
@@ -64,7 +67,7 @@ export default function Heat({ indices, fx, yields }: { indices: Item[]; fx: Ite
           );
         })}
       </div>
-      <p className="note mt-3">Shade grows with the size of the daily move, up to 3%. {view === "bond" ? "Bond tiles stay neutral because yield changes are not connected yet. " : ""}Tiles are the same size until market-cap weights are available. Tiles marked with a dash are waiting for a data feed.</p>
+      <p className="note mt-3">Shade grows with the size of the daily move, up to 3%. {view === "com" ? "Commodity prices are in US dollars per unit. " : ""}{view === "bond" ? "Bond tiles stay neutral because yield changes are not connected yet. " : ""}Tiles are the same size until market-cap weights are available. Tiles marked with a dash are waiting for a data feed.</p>
     </div>
   );
 }

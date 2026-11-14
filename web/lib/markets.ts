@@ -8,10 +8,18 @@ export const INDICES: [string, string, string][] = [
   ["^GSPC", "S&P 500", "Americas"], ["^IXIC", "Nasdaq Composite", "Americas"], ["^DJI", "Dow Jones", "Americas"],
   ["^FTSE", "FTSE 100", "Europe"], ["^STOXX50E", "Euro Stoxx 50", "Europe"], ["^GDAXI", "DAX", "Europe"], ["^FCHI", "CAC 40", "Europe"],
   ["^N225", "Nikkei 225", "Asia-Pacific"], ["^HSI", "Hang Seng", "Asia-Pacific"],
+  // Africa: symbols are best guesses for FMP. If the free plan does not return one, it shows as unavailable (and is cached as a failure).
+  ["^J200.JO", "JSE Top 40", "Africa"], ["^CASE30", "EGX 30", "Africa"], ["^NGSEINDX", "NGX All-Share", "Africa"], ["^NSE20", "NSE 20", "Africa"],
 ];
 export const FX: [string, string][] = [
   ["EURUSD", "EUR/USD"], ["GBPUSD", "GBP/USD"], ["USDJPY", "USD/JPY"], ["USDCHF", "USD/CHF"],
   ["AUDUSD", "AUD/USD"], ["USDCAD", "USD/CAD"], ["NZDUSD", "NZD/USD"],
+  ["USDZAR", "USD/ZAR"], ["USDEGP", "USD/EGP"], ["USDNGN", "USD/NGN"], ["USDKES", "USD/KES"],
+];
+/** Commodity quotes: [FMP symbol, label, group]. */
+export const COMMODITIES: [string, string, string][] = [
+  ["GCUSD", "Gold", "Metals"], ["SIUSD", "Silver", "Metals"], ["PLUSD", "Platinum", "Metals"], ["HGUSD", "Copper", "Metals"],
+  ["CLUSD", "Crude oil (WTI)", "Energy"], ["BZUSD", "Brent crude", "Energy"], ["NGUSD", "Natural gas", "Energy"],
 ];
 
 export type Row<T> =
@@ -32,5 +40,7 @@ export async function getMarketSnapshot() {
   for (const [sym, label, region] of INDICES) indices.push(await safe(label, sym, region, getQuote(sym)));
   const fx: Row<Quote>[] = [];
   for (const [sym, label] of FX) fx.push(await safe(label, sym, sym.endsWith("USD") ? "Majors (USD quote)" : "USD against others", getQuote(sym)));
-  return { yields, indices, fx, generatedAt: new Date().toISOString() };
+  const commodities: Row<Quote>[] = [];
+  for (const [sym, label, group] of COMMODITIES) commodities.push(await safe(label, sym, group, getQuote(sym)));
+  return { yields, indices, fx, commodities, generatedAt: new Date().toISOString() };
 }
