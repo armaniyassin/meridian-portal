@@ -1,32 +1,70 @@
+"use client";
+import { useState } from "react";
+import { HUBS, regionOf } from "@/lib/hubs";
+import { squarify } from "@/lib/treemap";
 import type { Item } from "@/lib/markets-view";
 
-/** Equal-sized tiles until market-cap weights exist. Shade shows size of the daily move; the sign and arrow carry the direction. */
-export default function Heat({ items }: { items: Item[] }) {
-  const regions = [...new Set(items.map((i) => i.group))];
+type View = "idx" | "fx" | "bond";
+const VIEWS: [View, string][] = [["idx", "Indices"], ["fx", "Currencies"], ["bond", "Bonds"]];
+const W = 1000, H = 520, G = 26;
+
+type Tile = { name: string; sub: string; reg: string; v: number | null; level?: string; w: number };
+const sign = (v: number) => `${v > 0 ? "▲ +" : v < 0 ? "▼ " : "■ "}${v.toFixed(2)}%`;
+
+/** Finviz-style treemap. Tiles are equal-sized until market-cap weights exist. Shade shows the size of the move; the arrow and sign carry direction. */
+export default function Heat({ indices, fx, yields }: { indices: Item[]; fx: Item[]; yields: Item[] }) {
+  const [view, setView] = useState<View>("idx");
+  const byLabel = (list: Item[], l: string) => list.find((i) => i.label === l);
+
+  const tiles: Tile[] = view === "idx"
+    ? HUBS.map((h) => ({ name: h.idx, sub: h.name, reg: regionOf(h), v: byLabel(indices, h.idx)?.value ?? null, w: 1 }))
+    : view === "fx"
+      ? [...new Set(HUBS.map((h) => h.fx))].map((p) => { const h = HUBS.find((x) => x.fx === p)!; return { name: p, sub: h.name, reg: regionOf(h), v: byLabel(fx, p)?.value ?? null, w: 1 }; })
+      : HUBS.filter((h) => h.bsrc).map((h) => {
+          const us = h.id === "nyc" ? yields.find((y) => y.label === "US 10-year Treasury") : undefined;
+          return { name: h.bond.replace(" 10-year", "").replace(" gilt", ""), sub: "10-year · " + h.name, reg: regionOf(h), v: null, level: us?.value != null ? `${us.value.toFixed(2)}%` : undefined, w: 1 };
+        });
+
+  const regs = ["Americas", "Europe", "Asia-Pacific"].map((r) => ({ r, w: tiles.filter((t) => t.reg === r).reduce((s, t) => s + t.w, 0) })).filter((g) => g.w > 0);
+  const groups = squarify(regs, 0, 0, W, H);
+
   return (
     <div>
-      {regions.map((g) => (
-        <section key={g} aria-label={g} className="mb-5">
-          <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted">{g}</h3>
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {items.filter((i) => i.group === g).map((i) => {
-              const v = i.value;
-              const mix = v == null ? 0 : Math.round(Math.min(1, Math.abs(v) / 3) * 55);
-              const bg = v == null ? "var(--surface2)" : `color-mix(in srgb, ${v >= 0 ? "var(--up)" : "var(--down)"} ${mix}%, var(--surface))`;
-              return (
-                <li key={i.label} className="rounded-lg border border-line p-3" style={{ background: bg }}>
-                  <div className="text-sm font-semibold">{i.label}</div>
-                  <div className="mt-2 font-mono text-lg tabular-nums">
-                    {v == null ? "—" : `${v > 0 ? "▲ +" : v < 0 ? "▼ " : "■ "}${v.toFixed(2)}%`}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div role="group" aria-label="Heatmap view" className="flex rounded-lg border border-line p-0.5">
+          {VIEWS.map(([k, name]) => (
+            <button key={k} type="button" aria-pressed={view === k} onClick={() => setView(k)} className={`rounded-md px-3 py-1.5 text-sm font-semibold ${view === k ? "bg-surface2" : "text-muted"}`}>{name}</button>
+          ))}
+        </div>
+        <div className="hmleg" aria-hidden="true"><span>−3%</span><i /><span>+3%</span></div>
+      </div>
+      <div className="hm" role="group" aria-label={`Market heatmap: ${VIEWS.find((v) => v[0] === view)![1]}`}>
+        {groups.map((g) => {
+          const its = tiles.filter((t) => t.reg === g.i.r);
+          const cells = squarify(its, g.x, g.y + G, g.w, g.h - G);
+          return (
+            <div key={g.i.r}>
+              <div className="hmg" style={{ left: `${(g.x / W) * 100}%`, top: `${(g.y / H) * 100}%`, width: `${(g.w / W) * 100}%`, height: `${(g.h / H) * 100}%` }}>
+                <span className="hmr">{g.i.r}</span>
+              </div>
+              {cells.map((c) => {
+                const t = c.i, v = t.v;
+                const p = v == null ? 0 : Math.round(14 + Math.min(Math.abs(v) / 3, 1) * 26); // capped so text keeps 4.5:1 contrast in both themes
+                const bg = v == null ? undefined : `color-mix(in srgb, var(${v >= 0 ? "--up" : "--down"}) ${p}%, var(--surface2))`;
+                return (
+                  <div key={t.name} className={`hmt ${v == null ? "na" : ""}`} role="img"
+                    aria-label={`${t.name}, ${t.sub}: ${v != null ? sign(v) : t.level ? `yield ${t.level}` : "awaiting feed"}`}
+                    style={{ left: `${(c.x / W) * 100}%`, top: `${(c.y / H) * 100}%`, width: `${(c.w / W) * 100}%`, height: `${(c.h / H) * 100}%`, background: bg, color: v == null ? undefined : "var(--text)" }}>
+                    <b>{t.name}</b><small>{t.sub}</small>
+                    <span className="mono">{v != null ? sign(v) : t.level ?? "—"}</span>
                   </div>
-                  {v == null && <div className="text-xs text-muted">{i.reason}</div>}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
-      <p className="note" aria-label="Legend">Shade grows with the size of the move, up to 3%. Tiles are the same size until market-cap weights are available.</p>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+      <p className="note mt-3">Shade grows with the size of the daily move, up to 3%. {view === "bond" ? "Bond tiles stay neutral because yield changes are not connected yet. " : ""}Tiles are the same size until market-cap weights are available. Tiles marked with a dash are waiting for a data feed.</p>
     </div>
   );
 }

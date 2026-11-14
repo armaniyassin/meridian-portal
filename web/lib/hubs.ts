@@ -55,3 +55,5 @@ export function humanMinutes(m: number | null): string {
   return ((d ? d + "d " : "") + (hh ? hh + "h " : "") + (!d ? mm + "m" : "")).trim();
 }
 export const pad = (n: number) => String(n).padStart(2, "0");
+
+export const regionOf = (h: Hub) => (h.tz.startsWith("America") ? "Americas" : h.tz.startsWith("Europe") ? "Europe" : "Asia-Pacific");

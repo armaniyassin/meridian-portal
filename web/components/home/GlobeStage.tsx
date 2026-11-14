@@ -39,7 +39,7 @@ export default function GlobeStage() {
         cyPx: (_R: number, _w: number, h: number) => h * 0.52,
         fp: (lat: number) => Math.max(-0.9, Math.min(0.9, lat * RAD * 0.8)),
         onPick: (h: { id: string }) => select(h.id),
-      });
+      }) as unknown as GlobeLike;
       g.active = "lon";
       globe.current = g;
       const loop = () => { g.frame(Date.now()); raf = requestAnimationFrame(loop); };

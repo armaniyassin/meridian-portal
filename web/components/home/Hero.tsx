@@ -21,7 +21,7 @@ export default function Hero() {
           <Link className="b solid lg" href="/markets">Explore markets {ARROW}</Link>
           <Link className="b lg" href="/brief">Get the weekly brief</Link>
         </div>
-        <p className="fine" id="disclosures">5 free sentiment reports. Educational information only, not financial advice.</p>
+        <p className="fine">5 free sentiment reports. Educational information only, not financial advice.</p>
       </div>
     </section>
   );
