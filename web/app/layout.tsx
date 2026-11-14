@@ -19,8 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body>
+        <a className="skip" href="#main">Skip to content</a>
         <Header />
-        <main>{children}</main>
+        <main id="main" tabIndex={-1}>{children}</main>
       </body>
     </html>
   );

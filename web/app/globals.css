@@ -103,3 +103,12 @@ h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-.04em;text-wrap:b
 .card{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:20px}
 .note{color:var(--muted);font-size:12.5px}
 main{position:relative;z-index:1}
+
+/* ---------- accessibility ---------- */
+:root{--upT:#2c7559;--downT:#ad4254} /* text-safe green and rose on light surfaces (4.5:1+) */
+:root[data-theme="dark"]{--upT:#62bf9c;--downT:#e07d8e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--upT:#62bf9c;--downT:#e07d8e}}
+html{scroll-padding-top:88px} /* keeps focused elements clear of the fixed header */
+.skip{position:absolute;left:12px;top:-60px;z-index:100;background:var(--btn);color:var(--btnText);padding:10px 14px;border-radius:8px;font-weight:600;text-decoration:none}
+.skip:focus{top:12px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

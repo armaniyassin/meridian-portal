@@ -1,7 +1,6 @@
 // @ts-nocheck
-// Canvas globe ported verbatim from the approved prototype (see docs/adr/0001).
-// Browser-only: load it with a dynamic import inside useEffect.
-import { HUBS, isOpen } from "@/lib/hubs";
+// Canvas globe ported from the approved prototype (see docs/adr/0001). Browser-only: load with a dynamic import.
+import { HUBS, isOpen, nextChange, humanMinutes as human, pad } from "@/lib/hubs";
 export const RAD = Math.PI / 180;
 
 /* ================= coarse land outlines [lon,lat]; rasterised to dots at load ================= */
@@ -104,7 +103,7 @@ export class Globe{
     c.addEventListener('pointerdown',e=>{ this.drag=true; lx=e.clientX; ly=e.clientY; moved=0; c.setPointerCapture(e.pointerId); c.classList.add('drag'); this.ty=null; });
     c.addEventListener('pointermove',e=>{
       const r=c.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
-      if(this.drag){ const dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY; moved+=Math.abs(dx)+Math.abs(dy);
+      if(this.drag){ this.hover=null; const dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY; moved+=Math.abs(dx)+Math.abs(dy);
         this.yaw -= dx/(this.R)*0.9; this.vel=-dx/(this.R)*0.9; this.pitch=Math.max(-1.25,Math.min(.8,this.pitch+dy/this.R*.6)); this.idle=300; }
       else this.hover=this.pick(mx,my);
       c.style.cursor = this.drag?'grabbing':(this.hover?'pointer':'grab');
@@ -119,6 +118,36 @@ export class Globe{
     for(const h of HUBS){ const p=this.project(h.lat*RAD,h.lon*RAD); if(p.z<.05) continue;
       const sx=this.cx+p.x*this.R*this.scale, sy=this.cy-p.y*this.R*this.scale, d=Math.hypot(sx-mx,sy-my); if(d<bd){bd=d;best=h;} }
     return best;
+  }
+  card(h,sx,sy,t,P,al){
+    const x=this.x, mk=Math.floor(t/60000), c=this._nc||(this._nc={});
+    if(!c[h.id]||c[h.id].mk!==mk) c[h.id]={mk, nc:nextChange(h,t)};
+    const nc=c[h.id].nc, open=nc.open, hm=m=>pad(Math.floor(m/60))+':'+pad(m%60);
+    const SANS=window.__sans||'system-ui,sans-serif';
+    // everything below the title is in the VISITOR'S time zone, except the market's own local hours
+    const day=d=>new Intl.DateTimeFormat('en-GB',{year:'numeric',month:'numeric',day:'numeric'}).format(d);
+    const hhmm=d=>new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(d);
+    let when='';
+    if(nc.at!=null){ const d=new Date(nc.at), same=day(d)===day(new Date(t));
+      when=(same?'Today':new Intl.DateTimeFormat('en-GB',{weekday:'short'}).format(d))+' '+hhmm(d)+' your time'; }
+    const stat=open?'Open':'Closed', main=nc.mins!=null?(open?'Closes in ':'Opens in ')+human(nc.mins):stat;
+    const foot='Hours '+hm(h.o)+'–'+hm(h.c)+' local  ·  Your time '+hhmm(new Date(t));
+    x.font='600 12px '+SANS; const wN=x.measureText(h.name).width;
+    x.font='500 11px '+SANS; const wS=x.measureText(stat).width;
+    x.font='600 15px '+SANS; const wM=x.measureText(main).width;
+    x.font='500 11.5px '+SANS; const wW=x.measureText(when).width;
+    x.font='400 10.5px '+SANS; const wF=x.measureText(foot).width;
+    const w=Math.ceil(Math.max(wN+wS+22,wM,wW,wF))+20, hgt=when?78:60;
+    let lx=sx+14; if(lx+w>this.w-6) lx=sx-14-w; const ly=Math.max(6,Math.min(this.h-hgt-6,sy-hgt/2));
+    x.save(); x.globalAlpha=al; x.fillStyle=P.labBg; x.strokeStyle=P.labLine; x.lineWidth=1;
+    x.beginPath(); x.roundRect(lx,ly,w,hgt,9); x.fill(); x.stroke();
+    x.textBaseline='alphabetic'; x.fillStyle=P.labFg; x.font='600 12px '+SANS; x.fillText(h.name,lx+10,ly+17);
+    x.font='500 11px '+SANS; x.fillStyle=open?P.up:P.mut; x.fillText(stat,lx+w-10-wS,ly+17);
+    x.fillStyle=P.labFg; x.font='600 15px '+SANS; x.fillText(main,lx+10,ly+38);
+    let yy=ly+38;
+    if(when){ yy+=17; x.fillStyle=open?P.up:P.labFg; x.font='500 11.5px '+SANS; x.fillText(when,lx+10,yy); }
+    x.fillStyle=P.mut; x.font='400 10.5px '+SANS; x.fillText(foot,lx+10,yy+16);
+    x.restore();
   }
   frame(t){
     const x=this.x, d=this.d, R=this.R*this.scale, P=window.__pal();
@@ -160,11 +189,20 @@ export class Globe{
         x.fillStyle = open?`rgba(16,185,129,${a})`:`rgba(148,163,184,${a*.9})`;
         x.beginPath(); x.arc(sx,sy,3.4,0,7); x.fill();
         if(act||hov){
+          if(!(h.key&&hov)){
           x.font='500 12px "Hanken Grotesk",sans-serif'; const w=x.measureText(h.name).width+14;
           x.fillStyle=P.labBg; x.strokeStyle=P.labLine; x.lineWidth=1;
           const lx=sx+14, ly=sy-11; x.beginPath(); x.roundRect(lx,ly,w,22,7); x.fill(); x.stroke();
-          x.fillStyle=P.labFg; x.fillText(h.name,lx+7,ly+15);
+          x.fillStyle=P.labFg; x.fillText(h.name,lx+7,ly+15); }
         }
+      }
+      // hover card (key exchanges only): fades in on hover, out on leave
+      const kh=this.hover&&this.hover.key?this.hover:null;
+      if(kh) this.ch=kh;
+      this.ca=(this.ca||0)+((kh?1:0)-(this.ca||0))*(this.reduce?1:.22);
+      if(this.ch&&this.ca>.03){
+        const p=this.project(this.ch.lat*RAD,this.ch.lon*RAD);
+        if(p.z>.02) this.card(this.ch,this.cx+p.x*R,this.cy-p.y*R,t,P,this.ca);
       }
     }
   }

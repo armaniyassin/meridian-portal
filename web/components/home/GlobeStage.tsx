@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HUBS, HUBS_BY_ID, nextChange, humanMinutes } from "@/lib/hubs";
 
-declare global { interface Window { __pal?: () => unknown } }
+declare global { interface Window { __pal?: () => unknown; __sans?: string } }
 type GlobeLike = { active: string | null; focus: (lon: number, lat: number) => void; frame: (t: number) => void };
 
 const isDark = () => {
@@ -10,8 +10,8 @@ const isDark = () => {
   return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
 };
 const palette = () => isDark()
-  ? { l: [226, 234, 246], n: [112, 138, 176], s: "150,176,214", limb1: "rgba(110,150,210,.14)", limb2: "rgba(150,185,235,.28)", labBg: "rgba(17,27,41,.92)", labLine: "#35506f", labFg: "#e8edf3" }
-  : { l: [38, 62, 100], n: [160, 172, 190], s: "80,100,130", limb1: "rgba(61,111,180,.06)", limb2: "rgba(61,111,180,.2)", labBg: "rgba(255,254,251,.96)", labLine: "#d6d2c6", labFg: "#1f2d3d" };
+  ? { l: [226, 234, 246], n: [112, 138, 176], s: "150,176,214", limb1: "rgba(110,150,210,.14)", limb2: "rgba(150,185,235,.28)", labBg: "rgba(17,27,41,.92)", labLine: "#35506f", labFg: "#e8edf3", up: "#62bf9c", mut: "#9aabbf" }
+  : { l: [38, 62, 100], n: [160, 172, 190], s: "80,100,130", limb1: "rgba(61,111,180,.06)", limb2: "rgba(61,111,180,.2)", labBg: "rgba(255,254,251,.96)", labLine: "#d6d2c6", labFg: "#1f2d3d", up: "#3f8f73", mut: "#667487" };
 
 export default function GlobeStage() {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -31,6 +31,7 @@ export default function GlobeStage() {
       const { Globe, RAD } = await import("@/lib/globe/globe");
       if (!alive || !canvas.current) return;
       window.__pal = palette;
+      window.__sans = getComputedStyle(document.body).fontFamily;
       const lonHome = Math.max(-170, Math.min(170, -new Date().getTimezoneOffset() / 4));
       const g = new Globe(canvas.current, {
         interactive: true, markers: true, auto: 0.0014, yaw: lonHome * RAD, pitch: 0.3, cx: 0.5,
