@@ -18,7 +18,7 @@ function Card({ title, children, note }: { title: string; children: React.ReactN
   );
 }
 const Missing = ({ label, error }: { label: string; error: string }) => (
-  <li className="flex justify-between py-2 text-sm"><span className="text-slate-400">{label}</span><span className="text-xs text-slate-500" title={error}>No data returned</span></li>
+  <li className="flex justify-between py-2 text-sm"><span className="text-slate-400">{label}</span><span className="max-w-[60%] truncate text-xs text-slate-500" title={error}>No data: {error}</span></li>
 );
 
 function QuoteRows({ rows, decimals }: { rows: Row<Quote>[]; decimals: number }) {
