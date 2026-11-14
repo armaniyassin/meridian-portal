@@ -229,8 +229,39 @@ h2{font-size:clamp(32px,4.6vw,56px);line-height:1.05}
 .anim .ar{animation:fadein 1.4s .3s ease both}
 @keyframes draw{to{stroke-dashoffset:0}}@keyframes fadein{from{opacity:0}}
 .hubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:14px}
+.mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.mgrid{grid-template-columns:1fr}}
+.mph{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:104px 1fr 62px;align-items:center;gap:10px;font-size:12px}
+.bg{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 0;padding-top:8px;border-top:1px solid var(--line)}
+.bg:first-child{border:0;margin:0;padding:0}
+.bl{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt{position:relative;height:10px;border-radius:5px;background:var(--surface2);overflow:hidden}
+.bt.mid:after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+.bt .fill{position:absolute;top:0;bottom:0;border-radius:5px}
+.bv{text-align:right;color:var(--muted)}
+.gauge{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.gmain{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.ominis{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:10px;flex:1;min-width:300px}
+.omini{background:var(--surface2);border-radius:12px;padding:10px;text-align:center}
+.omini svg{width:100%;max-width:150px;height:auto}
+.on{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ol{font-size:16px;font-weight:600;margin-top:2px}
+.cgrid{display:grid;grid-template-columns:minmax(220px,1fr) 3fr;gap:12px}
+.ctiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ctile{background:var(--surface2);border-radius:12px;padding:12px;display:grid;gap:4px;align-content:start}
+.ctile.big{border:1px solid var(--accent)}
+.ctile .cc b{font-weight:600;font-size:15px;margin-right:6px}
+.ctile .cc span{font-size:11px;color:var(--muted)}
+.ctile .cv{font-size:20px}
+.ctile.big .cv{font-size:28px}
+@media (max-width:900px){.cgrid{grid-template-columns:1fr}.ctiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mpanel.wide{grid-column:1/-1}
+@media (max-width:600px){.ominis{grid-template-columns:repeat(2,1fr)}}
+.gauge svg{width:min(300px,100%);height:auto}
+.gl{font-size:30px;font-weight:600;letter-spacing:-.02em}
 .hubc{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;text-align:left;display:grid;gap:3px;transition:transform .25s,border-color .25s}
-.hubc:hover{transform:translateY(-2px)}
 .hubc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
 .hubc .a{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
 .hubc .a i{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none}
@@ -595,12 +626,10 @@ blockquote{font-size:clamp(24px,3.6vw,42px);line-height:1.12;letter-spacing:-.03
 <section class="page" id="p-markets" data-page="markets" hidden>
   <div class="wrap pg">
     <div class="pg-h"><div class="eyebrow">Markets</div>
-      <h1 class="two fx">Eleven centres. <span class="dim">One clock.</span></h1>
-      <p class="lede">Drag the globe or pick a centre. Green markers are open now, based on typical trading hours in each exchange's local time.</p></div>
-    <div class="card gcard rv"><canvas id="globe2" role="img" aria-label="Interactive globe of financial centres"></canvas><aside class="hubc-card" id="hubCard" aria-live="polite"></aside></div>
+      <h1 class="two fx">Every market. <span class="dim">One view.</span></h1>
+      <p class="lede">Bonds, indices, stocks and currencies, each on its own chart. Options come as one simple reading: bullish or bearish.</p></div>
     <div class="tabs"><div class="seg" role="tablist" aria-label="Market views" id="mtabs">
-      <button type="button" data-t="sessions" aria-pressed="true">Sessions</button><button type="button" data-t="bonds" aria-pressed="false">Bonds</button>
-      <button type="button" data-t="fx" aria-pressed="false">Currencies</button><button type="button" data-t="indices" aria-pressed="false">Indices</button><button type="button" data-t="heat" aria-pressed="false">Heatmap</button></div>
+      <button type="button" data-t="overview" aria-pressed="true">Overview</button><button type="button" data-t="bonds" aria-pressed="false">Bonds</button><button type="button" data-t="indices" aria-pressed="false">Indices</button><button type="button" data-t="stocks" aria-pressed="false">Stocks</button><button type="button" data-t="options" aria-pressed="false">Options</button><button type="button" data-t="fx" aria-pressed="false">Currencies</button><button type="button" data-t="heat" aria-pressed="false">Heatmap</button><button type="button" data-t="sessions" aria-pressed="false">Sessions</button></div>
       <span class="note" style="margin:0">Last updated: <span class="mono" id="mLU">awaiting feed</span></span></div>
     <div id="mBody"></div>
   </div>
@@ -942,16 +971,14 @@ const toast = (()=>{let t; return m=>{const el=$('#toast'); el.textContent=m; el
 const ARROW='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
 /* ================= state ================= */
-let current='lon', page=null, mtab='sessions', range='day', tzMode='utc', quota=5, sortKey='ticker', secIdx=0, animChart=true, lastRun=null;
-const layers={eq:true,bd:true,fx:true};
+let current='lon', page=null, mtab='overview', range='day', tzMode='utc', quota=5, sortKey='ticker', secIdx=0, animChart=true, lastRun=null;
 const rowsT=[['AAPL','Technology'],['MSFT','Technology'],['NVDA','Technology'],['AMZN','Consumer Discretionary'],['TSLA','Consumer Discretionary'],['JPM','Financials'],['XOM','Energy'],['JNJ','Health Care']].map(([t,s])=>({t,s,state:'idle'}));
 
 /* ================= globes ================= */
 const lonHome = Math.max(-170,Math.min(170,-new Date().getTimezoneOffset()/4));
 const g1 = new Globe($('#globe'), {interactive:true, markers:true, auto:.0014, yaw:lonHome*RAD, pitch:.3, cx:.5, R:(w,h)=>Math.min(w*.3,h*.37,360), cyPx:(R,w,h)=>h*.52, fp:lat=>Math.max(-.9,Math.min(.9,lat*RAD*.8)), onPick:h=>select(h.id)});
-const g2 = new Globe($('#globe2'), {interactive:true, markers:true, auto:.0012, yaw:lonHome*RAD, pitch:.3, cx:.36, R:(w,h)=>Math.min(h*.43,w*.3), fp:lat=>Math.max(-.9,Math.min(.9,lat*RAD*.8)), onPick:h=>select(h.id)});
-addEventListener('resize',()=>{ g1.resize(); g2.resize(); moveInd(); });
-function select(id,noFocus){ current=id; g1.active=g2.active=id; const h=byId[id]; if(!noFocus){ g1.focus(h.lon,h.lat); g2.focus(h.lon,h.lat);} drawHubInfo(); if(page==='markets') drawMarkets(false); }
+addEventListener('resize',()=>{ g1.resize(); moveInd(); });
+function select(id,noFocus){ current=id; g1.active=id; const h=byId[id]; if(!noFocus){ g1.focus(h.lon,h.lat);} drawHubInfo(); }
 function cycle(d){ const i=HUBS.findIndex(h=>h.id===current); select(HUBS[(i+d+HUBS.length)%HUBS.length].id); }
 $('#prevHub').onclick=()=>cycle(-1); $('#nextHub').onclick=()=>cycle(1);
 function drawHubInfo(){ const h=byId[current], nc=nextChange(h,Date.now());
@@ -990,7 +1017,7 @@ function onShow(p){
   if(p==='home'){ g1.resize(); drawHubInfo(); initTrust(); initTips(); drawHeat(); }
   if(p==='news'){ drawNews(); }
   if(p==='article'){ drawArticle(); }
-  if(p==='markets'){ g2.resize(); drawMarkets(true); }
+  if(p==='markets'){ drawMarkets(true); }
   if(p==='sentiment'){ drawSent(); }
   if(p==='academy'){ drawAcademy(); }
   setupReveals(); applyFocus();
@@ -1110,17 +1137,6 @@ function areaSVG(s){
   ${grid}<path class="ar" d="${line} L${X(n-1)} ${H-bot} L${X(0)} ${H-bot} Z" fill="url(#ag)"/><path class="ln" d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" pathLength="1400"/>${nd}
   <text x="2" y="${top-3}" font-size="10" fill="var(--muted)" font-family="Geist Mono,monospace">${max}</text></svg>`;
 }
-function hubCard(){
-  const h=byId[current], t=Date.now(), nc=nextChange(h,t), d=store[h.id]||{};
-  return `<div class="hcH"><div><div style="font-size:11px;color:var(--muted)">${h.ex} · local <span class="mono">${localClock(h.tz,t)}</span></div><h3>${h.name}</h3></div>
-    <span class="tag ${nc.open?'open':'closed'}">${nc.open?'Open':'Closed'}${nc.mins!=null?' · '+human(nc.mins):''}</span></div>
-    <div class="chips"><button class="chip" data-l="eq" aria-pressed="${layers.eq}"><span class="kbd">E</span>Equities</button><button class="chip" data-l="bd" aria-pressed="${layers.bd}"><span class="kbd">B</span>Bonds</button><button class="chip" data-l="fx" aria-pressed="${layers.fx}"><span class="kbd">F</span>FX</button></div>
-    <div class="rows">
-      <div class="row ${layers.eq?'':'off'}"><span class="k">Equity index</span><span class="n">${h.idx}</span><span class="v">${fmtIdx(d.idx)}</span><span class="src">FMP</span></div>
-      <div class="row ${layers.bd?'':'off'}"><span class="k">10-year yield</span><span class="n">${h.bond}</span><span class="v">${h.bsrc?fmtPct(d.bond)+(d.bond!=null?'%':''):'n/a'}</span><span class="src">${h.bsrc||'no source yet'}</span></div>
-      <div class="row ${layers.fx?'':'off'}"><span class="k">FX pair</span><span class="n">${h.fx}</span><span class="v">${fmtFx(d.fx)}</span><span class="src">FMP</span></div>
-    </div><p class="note"><b style="font-weight:500;color:var(--text)">Last updated:</b> <span class="mono">${d.ts||'awaiting feed'}</span></p>`;
-}
 function tabSessions(){
   const t=Date.now(), s=seriesData(), openN=openCount(t);
   return `<div class="grid2"><div class="card"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">
@@ -1132,27 +1148,94 @@ function tabSessions(){
       <div class="readout" id="ro">${s.nowIdx>=0?s.desc[s.nowIdx]+' (now)':'Move over the chart for details.'}</div></div>
     <div class="card"><h3>How to read this</h3><p class="note" style="font-size:13.5px;margin-top:8px">The line counts how many of the eleven exchanges are in their regular session at each hour. Sessions overlap when Europe closes and New York opens, and when Asia hands over to Europe.</p>
     <p class="note" style="font-size:13.5px">Weekends show zero. Holidays are not included.</p></div></div>
-    <div class="hubs">${HUBS.map(x=>{const o=isOpen(x,t); return `<button class="hubc ${o?'open':''}" data-id="${x.id}" aria-pressed="${x.id===current}"><span class="a"><i></i>${x.name}</span><span class="s">${x.ex} · ${o?'open':'closed'}</span><span class="tm">${localClock(x.tz,t)}</span></button>`}).join('')}</div>`;
+    <div class="hubs">${HUBS.map(x=>{const o=isOpen(x,t); return `<div class="hubc ${o?'open':''}"><span class="a"><i></i>${x.name}</span><span class="s">${x.ex} · ${o?'open':'closed'}</span><span class="tm">${localClock(x.tz,t)}</span></div>`}).join('')}</div>`;
 }
+/* ---- separate market panels: bonds, indices, stocks, options. Values only from the data adapter; empty until then ---- */
+const num=v=>v==null||v===''||isNaN(Number(v))?null:Number(v);
+const STOCK_LIST=()=>rowsT.map(r=>r.t);
+function panelItems(kind){
+  if(kind==='bonds') return [{g:'US Treasuries',l:'US 2-year',v:num(store.macro&&store.macro.dgs2)},{g:'US Treasuries',l:'US 10-year',v:num(store.macro&&store.macro.dgs10)},...HUBS.filter(h=>h.bsrc&&h.id!=='nyc').map(h=>{const d=store[h.id]||{}; return {g:regionOf(h),l:h.bond.replace(' 10-year',' 10y').replace('Germany 10y Bund','Germany 10y').replace('UK 10y gilt','UK 10y'),v:num(d.bond&&typeof d.bond==='object'?d.bond.val:d.bond)};})];
+  if(kind==='indices') return HUBS.map(h=>{const d=store[h.id]||{}; return {g:regionOf(h),l:h.idx,v:hmChg(d.idx)};});
+  if(kind==='fx'){ const seen={}; return HUBS.filter(h=>!seen[h.fx]&&(seen[h.fx]=1)).map(h=>({g:h.fx.endsWith('/USD')?'Majors (USD quote)':'USD against others',l:h.fx,v:hmChg((store[h.id]||{}).fx)})).sort((a,b)=>a.g<b.g?-1:a.g>b.g?1:0); }
+  const st=Array.isArray(store.stocks)?store.stocks:[]; return rowsT.map(r=>{const t=r.t, f=st.find(x=>x.t===t); return {g:r.s,l:t,v:f?num(f.chg):null};});
+}
+function barsHTML(items,mode){
+  const have=items.filter(i=>i.v!=null), max=mode==='yld'?Math.max(6,...have.map(i=>i.v)):3;
+  let lastG=null;
+  return `<div class="bars">${items.map(i=>{
+    const gh=i.g&&i.g!==lastG?`<div class="bg">${i.g}</div>`:''; lastG=i.g;
+    let bar='', val='—';
+    if(i.v!=null){ if(mode==='yld'){ bar=`<b class="fill" style="left:0;width:${Math.min(100,i.v/max*100)}%;background:var(--accent)"></b>`; val=i.v.toFixed(2)+'%'; }
+      else { const w=Math.min(50,Math.abs(i.v)/max*50); bar=`<b class="fill" style="${i.v>=0?'left:50':'left:'+(50-w)}%;width:${w}%;background:var(${i.v>=0?'--up':'--down'})"></b>`; val=(i.v>0?'+':'')+i.v.toFixed(2)+'%'; } }
+    return gh+`<div class="bar"><span class="bl">${i.l}</span><span class="bt ${mode==='chg'?'mid':''}">${bar}</span><span class="bv mono">${val}</span></div>`; }).join('')}</div>`;
+}
+function panel(id,title,sub,src,body,wide){
+  return `<section class="card mpanel ${wide?'wide':''}" id="mp-${id}"><div class="mph"><div><h3>${title}</h3><p class="note" style="margin:2px 0 0">${sub}</p></div><span class="tag closed" style="align-self:flex-start">${src}</span></div>${body}</section>`;
+}
+const feedNote=(items)=>items.some(i=>i.v!=null)?'':'<p class="note">Awaiting feed. Bars appear once real data is connected; nothing is estimated.</p>';
+function bondsPanel(){ const it=panelItems('bonds'); return panel('bonds','Bonds','Government yields in percent: US Treasuries first, then 10-year by region','FRED · FMP',barsHTML(it,'yld')+feedNote(it)); }
+function indicesPanel(){ const it=panelItems('indices'); return panel('indices','Indices','Daily move of benchmark indices, grouped by region','FMP',barsHTML(it,'chg')+feedNote(it)); }
+function fxPanel(){ const it=panelItems('fx'); return panel('fx','Currencies','Daily move of the main pairs, majors first','FMP',barsHTML(it,'chg')+feedNote(it)); }
+/* individual currency performance: DXY first, then the most traded currencies against the US dollar. Values only from PortalData.setCurrencies */
+const CCY=[['EUR','Euro'],['JPY','Japanese yen'],['GBP','British pound'],['CHF','Swiss franc'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['NZD','New Zealand dollar'],['CNY','Chinese yuan']];
+function ccyTile(code,name,sub,big){
+  const f=(Array.isArray(store.currencies)?store.currencies:[]).find(x=>x.c===code), v=f?num(f.chg):null, up=v>0, dn=v<0;
+  const col=v==null?'var(--muted)':up?'var(--up)':dn?'var(--down)':'var(--text)', ar=v==null?'':up?'▲':dn?'▼':'■';
+  return `<div class="ctile ${big?'big':''}"><div class="cc"><b>${code}</b><span>${name}</span></div><div class="cv mono" style="color:${col}">${v==null?'—':ar+' '+(v>0?'+':'')+v.toFixed(2)+'%'}</div><div class="note" style="margin:0">${v==null?'Awaiting feed':sub}</div></div>`;
+}
+function strengthPanel(){
+  const body=`<div class="cgrid">${ccyTile('DXY','US dollar index','Dollar vs a basket of 6 majors',true)}<div class="ctiles">${CCY.map(([c,n])=>ccyTile(c,n,'vs US dollar')).join('')}</div></div>
+    <p class="note">Up means the currency gained against the US dollar today; down means it lost. The dollar index (DXY) shows the dollar itself against a basket of EUR, JPY, GBP, CAD, SEK and CHF.</p>`;
+  return panel('strength','Currency strength','The dollar and the most traded currencies, one by one','FMP · tbc',body,true);
+}
+function stocksPanel(){ const it=panelItems('stocks'); return panel('stocks','Stocks','Daily move of the tickers in Sentiment, grouped by sector','FMP · Finnhub',barsHTML(it,'chg')+feedNote(it)); }
+/* options: one simple reading, bullish or bearish, from the equity put/call ratio */
+const OPT={lo:0.7,hi:1.0,min:0.5,max:1.2};
+const OPT_PARTS=[['indices','Indices'],['stocks','Stocks'],['bonds','Bonds'],['fx','Currencies']];
+function optState(key){ const o=store.options||{}, src=key?((o.by||{})[key]||{}):o, p=num(src.pcr); if(p==null) return {p:null}; const f=Math.max(0,Math.min(1,(OPT.max-p)/(OPT.max-OPT.min))); return {p,f,label:p<OPT.lo?'Bullish':p>OPT.hi?'Bearish':'Neutral',ts:src.ts||o.ts}; }
+function gaugeSVG(st){
+  const cx=150,cy=150,r=112,pt=(f,rr)=>{const t=Math.PI*(1-f); return [cx+rr*Math.cos(t),cy-rr*Math.sin(t)];};
+  const f1=(OPT.max-OPT.hi)/(OPT.max-OPT.min), f2=(OPT.max-OPT.lo)/(OPT.max-OPT.min);
+  const arc=(a,b,c)=>{const A=pt(a,r),B=pt(b,r); return `<path d="M${A[0].toFixed(1)} ${A[1].toFixed(1)} A${r} ${r} 0 0 1 ${B[0].toFixed(1)} ${B[1].toFixed(1)}" fill="none" stroke="${c}" stroke-width="16" stroke-linecap="butt" opacity="${st.p==null?.35:.9}"/>`;};
+  const needle=st.p==null?'':(()=>{const N=pt(st.f,r-22); return `<line x1="${cx}" y1="${cy}" x2="${N[0].toFixed(1)}" y2="${N[1].toFixed(1)}" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="6" fill="var(--text)"/>`;})();
+  return `<svg viewBox="0 0 300 175" role="img" aria-label="Options sentiment gauge: ${st.p==null?'awaiting feed':st.label}">${arc(0,f1-.004,'var(--down)')}${arc(f1,f2,'var(--muted)')}${arc(f2+.004,1,'var(--up)')}${needle}
+    <text x="${cx-r}" y="170" text-anchor="middle" font-size="11" fill="var(--muted)">Bearish</text><text x="${cx+r}" y="170" text-anchor="middle" font-size="11" fill="var(--muted)">Bullish</text></svg>`;
+}
+function optColor(st){ return st.p==null?'var(--muted)':st.label==='Bullish'?'var(--up)':st.label==='Bearish'?'var(--down)':'var(--text)'; }
+function optionsPanel(big){
+  const st=optState(), parts=OPT_PARTS.map(([k,n])=>{ const x=optState(k); return `<div class="omini"><div class="on">${n}</div>${gaugeSVG(x)}<div class="ol" style="color:${optColor(x)}">${x.p==null?'—':x.label}</div><div class="note" style="margin:0">${x.p==null?'Awaiting feed':'P/C <span class="mono" style="color:var(--text)">'+x.p.toFixed(2)+'</span>'}</div></div>`; }).join('');
+  const body=`<div class="gauge"><div class="gmain">${gaugeSVG(st)}<div class="gread"><div class="gl" style="color:${optColor(st)}">${st.p==null?'—':st.label}</div>
+    <div class="note" style="margin:0">${st.p==null?'Overall · awaiting feed':'Overall · put/call <span class="mono" style="color:var(--text)">'+st.p.toFixed(2)+'</span>'+(st.ts?' · '+st.ts:'')}</div></div></div>
+    <div class="ominis">${parts}</div></div>
+    <p class="note">One overall reading, then the same bullish or bearish reading for indices, stocks, bonds and currencies. Puts bought against calls bought: fewer puts than calls leans bullish, more puts leans bearish. Source to be confirmed.</p>`;
+  return panel('options','Options','Bullish or bearish: overall and by market','source tbc',body,true);
+}
+function optionsExplainer(){
+  return `<div class="card" style="margin-top:14px"><h3>Why options matter</h3>
+    <p class="note" style="font-size:13.5px;margin-top:8px">Options show what traders are paying to protect against a fall or to bet on a rise. That positioning often moves before prices do, and most retail screens leave it out.</p>
+    <p class="note" style="font-size:13.5px">The gauge uses the put/call ratio: below ${OPT.lo.toFixed(2)} reads bullish, above ${OPT.hi.toFixed(2)} reads bearish, in between neutral. These cut-offs are a simple convention. Extreme readings are sometimes read the other way, as a contrarian signal, so treat it as context, not a forecast.</p></div>`;
+}
+function tabOverview(){ return `<div class="mgrid">${bondsPanel()}${indicesPanel()}${stocksPanel()}${fxPanel()}${strengthPanel()}${optionsPanel()}</div>`; }
 function tabBonds(){
   const rows=[['US 2-year Treasury','FRED DGS2'],['US 10-year Treasury','FRED DGS10'],['VIX volatility index','FRED VIXCLS'],...HUBS.filter(h=>h.id!=='nyc').map(h=>[h.bond,h.bsrc||'no source yet'])];
-  return `<div class="tablewrap"><table><thead><tr><th>Instrument</th><th>Source</th><th>Yield</th><th>Last updated</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td class="mono" style="color:var(--muted)">${r[1]}</td><td class="mono">—</td><td class="mono" style="color:var(--muted)">awaiting feed</td></tr>`).join('')}</tbody></table></div>
+  return bondsPanel()+`<div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>Instrument</th><th>Source</th><th>Yield</th><th>Last updated</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td class="mono" style="color:var(--muted)">${r[1]}</td><td class="mono">—</td><td class="mono" style="color:var(--muted)">awaiting feed</td></tr>`).join('')}</tbody></table></div>
     <p class="note">Yields show two decimals once the feed is connected. FRED data arrives with about one day of delay.</p>`;
 }
 function tabFx(){
   const pairs=[...new Set(HUBS.map(h=>h.fx))];
-  return `<div class="tablewrap"><table><thead><tr><th>Pair</th><th>Source</th><th>Rate</th><th>Last updated</th></tr></thead><tbody>${pairs.map(p=>`<tr><td>${p}</td><td class="mono" style="color:var(--muted)">FMP</td><td class="mono">—</td><td class="mono" style="color:var(--muted)">awaiting feed</td></tr>`).join('')}</tbody></table></div>
+  return strengthPanel()+fxPanel()+`<div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>Pair</th><th>Source</th><th>Rate</th><th>Last updated</th></tr></thead><tbody>${pairs.map(p=>`<tr><td>${p}</td><td class="mono" style="color:var(--muted)">FMP</td><td class="mono">—</td><td class="mono" style="color:var(--muted)">awaiting feed</td></tr>`).join('')}</tbody></table></div>
     <p class="note">Rates show four decimals once the feed is connected.</p>`;
 }
 function tabIdx(){
-  return `<div class="heat">${HUBS.map(h=>`<div class="tile" tabindex="0"><span>${h.idx}<br><small style="color:var(--muted)">${h.name}</small></span><span class="mono">—</span></div>`).join('')}</div>
-    <p class="note">Tiles colour by daily move, emerald up and rose down, once the index feed is connected.</p>`;
+  return indicesPanel()+`<div class="heat" style="margin-top:14px">${HUBS.map(h=>`<div class="tile" tabindex="0"><span>${h.idx}<br><small style="color:var(--muted)">${h.name}</small></span><span class="mono">—</span></div>`).join('')}</div>
+    <p class="note">Tiles colour by daily move, green up and rose down, once the index feed is connected.</p>`;
 }
+function tabStocks(){ return stocksPanel()+`<p class="note">Tickers follow the Sentiment tab. Add more once the stock feed is connected.</p>`; }
+function tabOptions(){ return optionsPanel(true)+optionsExplainer(); }
 function drawMarkets(anim){
   animChart=!!anim;
-  $('#hubCard').innerHTML=hubCard();
-  const b=$('#mBody'), keep=scrollY;
-  b.innerHTML = mtab==='sessions'?tabSessions(): mtab==='bonds'?tabBonds(): mtab==='fx'?tabFx(): mtab==='heat'?tabHeat(): tabIdx();
+  const b=$('#mBody');
+  b.innerHTML = {overview:tabOverview,bonds:tabBonds,indices:tabIdx,stocks:tabStocks,options:tabOptions,fx:tabFx,heat:tabHeat,sessions:tabSessions}[mtab]();
   if(mtab==='sessions') bindChart();
   $$('#mtabs button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.t===mtab));
 }
@@ -1163,9 +1246,8 @@ function bindChart(){
   hov.addEventListener('pointerleave',()=>{cur.style.opacity=0; ro.innerHTML=s.nowIdx>=0?s.desc[s.nowIdx]+' (now)':'Move over the chart for details.';});
 }
 $('#p-markets').addEventListener('click',e=>{
-  const t=e.target, tab=t.closest('#mtabs button'), r=t.closest('[data-range]'), z=t.closest('[data-tz]'), hc=t.closest('.hubc'), ch=t.closest('.chip[data-l]');
+  const t=e.target, tab=t.closest('#mtabs button'), r=t.closest('[data-range]'), z=t.closest('[data-tz]');
   if(tab){ mtab=tab.dataset.t; drawMarkets(true); } else if(r){ range=r.dataset.range; drawMarkets(true); } else if(z){ tzMode=z.dataset.tz; drawMarkets(true); }
-  else if(hc){ select(hc.dataset.id); scrollTo({top:0,behavior:REDUCE?'auto':'smooth'}); } else if(ch){ layers[ch.dataset.l]=!layers[ch.dataset.l]; drawMarkets(false); }
 });
 
 /* ================= sentiment page ================= */
@@ -1353,6 +1435,12 @@ function initTips(){
 /* ================= news page ================= */
 let newsCat='All', qIdx=0, qTimer=null;
 const feedItems=()=>Array.isArray(store.news)?store.news:[];
+window.PortalData.setStocks=items=>{ store.stocks=items; $('#feedState').textContent='connected'; refreshPage(); };
+window.PortalData.setMacro=m=>{ store.macro=Object.assign(store.macro||{},m); $('#feedState').textContent='connected'; refreshPage(); };
+/* setOptions({pcr, ts, by:{indices:{pcr}, stocks:{pcr}, bonds:{pcr}, fx:{pcr}}}) */
+/* setCurrencies([{c:'DXY',chg:0.12},{c:'EUR',chg:-0.2},...]): chg is the daily % move of that currency against the US dollar (DXY: the index itself) */
+window.PortalData.setCurrencies=items=>{ store.currencies=items; $('#feedState').textContent='connected'; refreshPage(); };
+window.PortalData.setOptions=o=>{ store.options=o; $('#feedState').textContent='connected'; refreshPage(); };
 window.PortalData.setNews=items=>{ store.news=items; $('#feedState').textContent='connected'; if(page==='news') drawNews(); };
 const ago=iso=>{ const d=new Date(iso); return isNaN(d)?'':d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}); };
 function topStories(){
@@ -1515,9 +1603,8 @@ addEventListener('keydown',e=>{
   if(e.key==='Escape'){ $('#scrim').classList.remove('on'); $('#more').classList.remove('open'); if(!$('#tipPop').hidden) popClose('tipPop'); if(!$('#newsPop').hidden) popClose('newsPop'); }
   if(e.target.matches('input,select,textarea')||e.metaKey||e.ctrlKey||e.altKey) return;
   const k=e.key.toLowerCase();
-  if(page==='markets'||page==='home'){
-    if(k==='e'||k==='b'||k==='f'){ layers[{e:'eq',b:'bd',f:'fx'}[k]]^=1; if(page==='markets') drawMarkets(false); }
-    else if(e.key==='ArrowRight') cycle(1); else if(e.key==='ArrowLeft') cycle(-1);
+  if(page==='home'){
+    if(e.key==='ArrowRight') cycle(1); else if(e.key==='ArrowLeft') cycle(-1);
   }
 });
 
@@ -1526,15 +1613,14 @@ setInterval(()=>{ drawHubInfo(); if(page==='markets') drawMarkets(false); },3000
 (function loop(){
   const now=Date.now();
   if(page==='home'){ g1.frame(now); const r=$('#ctaSec').getBoundingClientRect(); if(r.top<innerHeight && r.bottom>0) waveFrame(performance.now()); }
-  else if(page==='markets') g2.frame(now);
   requestAnimationFrame(loop);
 })();
 
 /* boot */
-select('lon',true); g1.yaw=g2.yaw=lonHome*RAD; g1.ty=g2.ty=null;
+select('lon',true); g1.yaw=lonHome*RAD; g1.ty=null;
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{ moveInd(); g1.resize(); });
 route();
-addEventListener('load',()=>{ moveInd(); g1.resize(); g2.resize(); });
+addEventListener('load',()=>{ moveInd(); g1.resize(); });
 
 })();
 </script>

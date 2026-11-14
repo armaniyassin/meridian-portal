@@ -229,8 +229,39 @@ h2{font-size:clamp(32px,4.6vw,56px);line-height:1.05}
 .anim .ar{animation:fadein 1.4s .3s ease both}
 @keyframes draw{to{stroke-dashoffset:0}}@keyframes fadein{from{opacity:0}}
 .hubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:14px}
+.mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.mgrid{grid-template-columns:1fr}}
+.mph{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:104px 1fr 62px;align-items:center;gap:10px;font-size:12px}
+.bg{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 0;padding-top:8px;border-top:1px solid var(--line)}
+.bg:first-child{border:0;margin:0;padding:0}
+.bl{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt{position:relative;height:10px;border-radius:5px;background:var(--surface2);overflow:hidden}
+.bt.mid:after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+.bt .fill{position:absolute;top:0;bottom:0;border-radius:5px}
+.bv{text-align:right;color:var(--muted)}
+.gauge{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.gmain{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.ominis{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:10px;flex:1;min-width:300px}
+.omini{background:var(--surface2);border-radius:12px;padding:10px;text-align:center}
+.omini svg{width:100%;max-width:150px;height:auto}
+.on{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ol{font-size:16px;font-weight:600;margin-top:2px}
+.cgrid{display:grid;grid-template-columns:minmax(220px,1fr) 3fr;gap:12px}
+.ctiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ctile{background:var(--surface2);border-radius:12px;padding:12px;display:grid;gap:4px;align-content:start}
+.ctile.big{border:1px solid var(--accent)}
+.ctile .cc b{font-weight:600;font-size:15px;margin-right:6px}
+.ctile .cc span{font-size:11px;color:var(--muted)}
+.ctile .cv{font-size:20px}
+.ctile.big .cv{font-size:28px}
+@media (max-width:900px){.cgrid{grid-template-columns:1fr}.ctiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mpanel.wide{grid-column:1/-1}
+@media (max-width:600px){.ominis{grid-template-columns:repeat(2,1fr)}}
+.gauge svg{width:min(300px,100%);height:auto}
+.gl{font-size:30px;font-weight:600;letter-spacing:-.02em}
 .hubc{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;text-align:left;display:grid;gap:3px;transition:transform .25s,border-color .25s}
-.hubc:hover{transform:translateY(-2px)}
 .hubc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
 .hubc .a{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
 .hubc .a i{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none}
@@ -595,12 +626,10 @@ blockquote{font-size:clamp(24px,3.6vw,42px);line-height:1.12;letter-spacing:-.03
 <section class="page" id="p-markets" data-page="markets" hidden>
   <div class="wrap pg">
     <div class="pg-h"><div class="eyebrow">Markets</div>
-      <h1 class="two fx">Eleven centres. <span class="dim">One clock.</span></h1>
-      <p class="lede">Drag the globe or pick a centre. Green markers are open now, based on typical trading hours in each exchange's local time.</p></div>
-    <div class="card gcard rv"><canvas id="globe2" role="img" aria-label="Interactive globe of financial centres"></canvas><aside class="hubc-card" id="hubCard" aria-live="polite"></aside></div>
+      <h1 class="two fx">Every market. <span class="dim">One view.</span></h1>
+      <p class="lede">Bonds, indices, stocks and currencies, each on its own chart. Options come as one simple reading: bullish or bearish.</p></div>
     <div class="tabs"><div class="seg" role="tablist" aria-label="Market views" id="mtabs">
-      <button type="button" data-t="sessions" aria-pressed="true">Sessions</button><button type="button" data-t="bonds" aria-pressed="false">Bonds</button>
-      <button type="button" data-t="fx" aria-pressed="false">Currencies</button><button type="button" data-t="indices" aria-pressed="false">Indices</button><button type="button" data-t="heat" aria-pressed="false">Heatmap</button></div>
+      <button type="button" data-t="overview" aria-pressed="true">Overview</button><button type="button" data-t="bonds" aria-pressed="false">Bonds</button><button type="button" data-t="indices" aria-pressed="false">Indices</button><button type="button" data-t="stocks" aria-pressed="false">Stocks</button><button type="button" data-t="options" aria-pressed="false">Options</button><button type="button" data-t="fx" aria-pressed="false">Currencies</button><button type="button" data-t="heat" aria-pressed="false">Heatmap</button><button type="button" data-t="sessions" aria-pressed="false">Sessions</button></div>
       <span class="note" style="margin:0">Last updated: <span class="mono" id="mLU">awaiting feed</span></span></div>
     <div id="mBody"></div>
   </div>
