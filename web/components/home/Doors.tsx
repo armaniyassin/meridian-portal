@@ -6,8 +6,8 @@ const Arrow = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" 
 const DOORS = [
   { n: "01", t: "Markets", href: "/markets", d: `Sovereign yields, major currencies, commodities and equity indices for ${HUB_COUNT_WORD} centres across four continents, with a live map of who is open.` },
   { n: "02", t: "Sentiment", href: "/sentiment", d: "Search a ticker for AI sentiment on recent headlines next to core fundamentals. Five reports are free." },
-  { n: "03", t: "Academy", href: "/academy", d: "Level-based lessons and quizzes inspired by CFA-level curriculum. The first level is free." },
-  { n: "04", t: "News and insights", href: "/news", d: "Market stories that matter, plain-language explainers on how finance works, and words from great investors." },
+  { n: "03", t: "Academy", href: "/academy", d: "Insights on how finance works, then level-based lessons and quizzes inspired by CFA-level curriculum. The first level is free." },
+  { n: "04", t: "News", href: "/news", d: "The market stories that matter, balanced between good and bad news, and removed after two weeks." },
 ];
 
 export default function Doors() {

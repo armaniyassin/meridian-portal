@@ -40,7 +40,7 @@ export default function Tips() {
                 <span className="tcat">{x.cat} · Tip {pad(i + 1)}</span>
                 <h3>{x.t}</h3>
                 <p>{x.d}</p>
-                {x.a ? <Link className="tl" href={`/news/${x.a}`} draggable={false}>Read the explainer <Chevron d="M5 12h14M13 6l6 6-6 6" /></Link> : <span className="tl" aria-hidden="true" style={{ opacity: 0 }}>.</span>}
+                {x.a ? <Link className="tl" href={`/academy/insights/${x.a}`} draggable={false}>Read the insight <Chevron d="M5 12h14M13 6l6 6-6 6" /></Link> : <span className="tl" aria-hidden="true" style={{ opacity: 0 }}>.</span>}
               </div>
             </article>
           ))}

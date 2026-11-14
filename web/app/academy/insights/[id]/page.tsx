@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ARTICLES, artById } from "@/lib/content";
 import Vis from "@/components/Vis";
 import CopyLink from "@/components/pages/CopyLink";
-import { NewsCard } from "@/components/pages/NewsView";
+import { InsightCard } from "@/components/pages/Insights";
 import DisclaimerFooter from "@/components/DisclaimerFooter";
 
 export const dynamicParams = false;
@@ -21,7 +21,7 @@ export default async function Article({ params }: { params: Promise<{ id: string
   return (
     <>
       <div className="wrap pg"><article className="art">
-        <Link className="back" href="/news">← All news and insights</Link>
+        <Link className="back" href="/academy#insights">← Academy insights</Link>
         <div className="eyebrow" style={{ marginTop: 22 }}>{a.cat} · {a.read} min read</div>
         <h1 className="fx" style={{ margin: "12px 0 16px" }}>{a.t}</h1>
         <p className="lede">{a.lede}</p>
@@ -31,7 +31,7 @@ export default async function Article({ params }: { params: Promise<{ id: string
         <div className="artact"><CopyLink /><Link className="b solid" href="/brief">Get the Sunday brief</Link></div>
         <p className="note" style={{ marginTop: 20 }}>Educational information only. It is not financial advice or a recommendation to buy or sell any security.</p>
         <div className="sh" style={{ marginTop: 44 }}><h2 style={{ fontSize: 22 }}>Keep reading</h2></div>
-        <div className="ngrid two">{rel.map((r) => <NewsCard key={r.id} {...r} />)}</div>
+        <div className="ngrid two">{rel.map((r) => <InsightCard key={r.id} {...r} />)}</div>
       </article></div>
       <DisclaimerFooter />
     </>
