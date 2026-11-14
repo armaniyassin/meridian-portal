@@ -137,3 +137,38 @@ html{scroll-padding-top:88px} /* keeps focused elements clear of the fixed heade
 .legal{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.6;max-width:980px}
 .legal p+p{margin-top:8px}
 @media (max-width:700px){.fcols{grid-template-columns:1fr 1fr}}
+
+/* Markets heatmap carousel */
+.hx-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.hx-tabs{position:relative;display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface2);max-width:100%;overflow-x:auto}
+.hx-tabs button{position:relative;z-index:1;flex:1 0 auto;min-width:96px;border:0;background:none;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--muted);transition:color .25s}
+.hx-tabs button[aria-selected=true]{color:var(--text)}
+.hx-pill{position:absolute;left:3px;top:3px;bottom:3px;z-index:0;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.14);transition:transform .45s cubic-bezier(.2,.8,.2,1);box-sizing:border-box;width:calc((100% - 6px)/var(--n,4))}
+.hx-nav{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.hx-nav button{width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--text);font-size:18px;line-height:1;transition:background .2s,transform .2s}
+.hx-nav button:hover{background:var(--surface2);transform:scale(1.06)}
+.hx-vp{overflow:hidden;border-radius:14px}
+.hx-track{display:flex;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.hx-slide{flex:0 0 100%;min-width:0;opacity:.35;transition:opacity .5s}
+.hx-slide.on{opacity:1}
+.hx-sum{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:10px}
+.hx-blurb{font-size:13.5px;color:var(--muted)}
+.hx-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hx-chips li{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--surface)}
+.hx-map{position:relative;width:100%;aspect-ratio:1000/500;min-height:340px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.hx-g{position:absolute;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-start;padding:7px 12px 0;font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--muted)}
+.hx-c{position:absolute;padding:3px;opacity:0;transform:translateY(8px) scale(.97);transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.hx-slide.on .hx-c{opacity:1;transform:none;transition-delay:var(--d,0ms)}
+.hx-t{position:relative;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;text-align:left;width:100%;height:100%;overflow:hidden;border:1px solid color-mix(in srgb,var(--text) 8%,transparent);border-radius:10px;padding:9px 11px;color:var(--text);background-image:linear-gradient(155deg,rgba(255,255,255,.09),transparent 55%);transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,border-color .25s}
+.hx-t b{font-weight:600;letter-spacing:-.02em;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hx-t small{font-size:11px;margin-top:2px;color:var(--muted)}
+.hx-t .font-mono{font-size:14px}
+.hx-t:hover,.hx-t.sel{transform:translateY(-2px) scale(1.015);z-index:3;border-color:var(--accent);box-shadow:0 10px 26px -8px rgba(0,0,0,.45)}
+.hx-read{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:12px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.hx-rn{font-size:15px}
+.hx-rv{font-size:20px;font-variant-numeric:tabular-nums;text-align:right}
+.hx-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.hx-dots{display:flex;gap:6px}
+.hx-dots button{width:7px;height:7px;padding:0;border:0;border-radius:99px;background:var(--line);transition:width .35s,background .35s}
+.hx-dots button.on{width:22px;background:var(--accent)}
+@media (max-width:700px){.hx-map{aspect-ratio:auto;height:520px}.hx-tabs button{min-width:84px;padding:7px 10px}}

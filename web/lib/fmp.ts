@@ -17,4 +17,4 @@ async function fetchQuote(symbol: string): Promise<Quote> {
 }
 
 export const getQuote = (symbol: string): Promise<Cached<Quote>> =>
-  getOrFetch(`fmp:quote:${symbol}`, 3 * 60 * 60, () => fetchQuote(symbol)); // 3h keeps us far below 250/day
+  getOrFetch(`fmp:quote:${symbol}`, 4 * 60 * 60, () => fetchQuote(symbol)); // 4h keeps us far below 250/day

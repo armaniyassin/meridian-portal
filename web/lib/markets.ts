@@ -1,6 +1,7 @@
 import "server-only";
 import { getFred, FRED_SERIES, type FredPoint } from "@/lib/fred";
 import { getQuote, type Quote } from "@/lib/fmp";
+import { getStockQuote } from "@/lib/finnhub";
 import type { Cached } from "@/lib/cache";
 
 /** [FMP symbol, label, region]. DAX and CAC 40 return HTTP 402 on the free FMP plan and are shown as unavailable. */
@@ -20,6 +21,12 @@ export const FX: [string, string][] = [
 export const COMMODITIES: [string, string, string][] = [
   ["GCUSD", "Gold", "Metals"], ["SIUSD", "Silver", "Metals"], ["PLUSD", "Platinum", "Metals"], ["HGUSD", "Copper", "Metals"],
   ["CLUSD", "Crude oil (WTI)", "Energy"], ["BZUSD", "Brent crude", "Energy"], ["NGUSD", "Natural gas", "Energy"],
+];
+
+/** Stocks shown on Markets: [ticker, sector]. Quotes come from Finnhub. */
+export const STOCKS: [string, string][] = [
+  ["AAPL", "Technology"], ["MSFT", "Technology"], ["NVDA", "Technology"], ["AMZN", "Consumer Discretionary"],
+  ["TSLA", "Consumer Discretionary"], ["JPM", "Financials"], ["XOM", "Energy"], ["JNJ", "Health Care"],
 ];
 
 export type Row<T> =
@@ -42,5 +49,7 @@ export async function getMarketSnapshot() {
   for (const [sym, label] of FX) fx.push(await safe(label, sym, sym.endsWith("USD") ? "Majors (USD quote)" : "USD against others", getQuote(sym)));
   const commodities: Row<Quote>[] = [];
   for (const [sym, label, group] of COMMODITIES) commodities.push(await safe(label, sym, group, getQuote(sym)));
-  return { yields, indices, fx, commodities, generatedAt: new Date().toISOString() };
+  const stocks: Row<Quote>[] = [];
+  for (const [sym, sector] of STOCKS) stocks.push(await safe(sym, sym, sector, getStockQuote(sym)));
+  return { yields, indices, fx, commodities, stocks, generatedAt: new Date().toISOString() };
 }

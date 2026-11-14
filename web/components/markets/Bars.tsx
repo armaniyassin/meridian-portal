@@ -33,7 +33,7 @@ export default function Bars({ items, mode, decimals = 2 }: { items: Item[]; mod
                   )}
                 </span>
                 {i.value == null ? (
-                  <span className="text-xs text-muted">{i.reason ?? "Awaiting feed"}</span>
+                  <span className="text-xs text-muted">—</span>
                 ) : mode === "yield" ? (
                   <span className="font-mono tabular-nums">{i.value.toFixed(2)}%{i.date && <span className="ml-1 text-xs text-muted">{i.date}</span>}</span>
                 ) : (

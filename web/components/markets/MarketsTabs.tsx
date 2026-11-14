@@ -1,7 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
 import type { MarketsData } from "@/lib/markets-view";
-import { HUB_COUNT_WORD } from "@/lib/hubs";
 import Bars from "@/components/markets/Bars";
 import StrengthGrid from "@/components/markets/Strength";
 import OptionsGauge, { type OptionsData } from "@/components/markets/OptionsGauge";
@@ -11,7 +10,8 @@ import Sessions from "@/components/markets/Sessions";
 const TABS = [["overview", "Overview"], ["bonds", "Bonds"], ["indices", "Indices"], ["currencies", "Currencies"], ["commodities", "Commodities"], ["stocks", "Stocks"], ["options", "Options"], ["heatmap", "Heatmap"], ["sessions", "Sessions"]] as const;
 type Tab = (typeof TABS)[number][0];
 const NO_OPTIONS: OptionsData = { overall: null };
-const STOCKS = [["AAPL", "Technology"], ["MSFT", "Technology"], ["NVDA", "Technology"], ["AMZN", "Consumer Discretionary"], ["TSLA", "Consumer Discretionary"], ["JPM", "Financials"], ["XOM", "Energy"], ["JNJ", "Health Care"]];
+
+function Empty({ children }: { children: React.ReactNode }) { return <p className="note py-2">{children}</p>; }
 
 function Panel({ title, sub, source, children }: { title: string; sub?: string; source: string; children: React.ReactNode }) {
   return (
@@ -39,7 +39,7 @@ export default function MarketsTabs({ data }: { data: MarketsData }) {
   const vix = data.vix;
   const bonds = (
     <Panel title="Bonds" sub="Government yields in percent: US Treasuries first, then 10-year by region" source="FRED · FMP">
-      <Bars items={data.yields} mode="yield" />
+      {data.yields.length ? <Bars items={data.yields} mode="yield" /> : <Empty>Yields are unavailable right now.</Empty>}
       {vix && (
         <p className="mt-3 flex items-baseline justify-between border-t border-line pt-3 text-sm">
           <span>VIX volatility index{vix.saved && <span className="ml-1 rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted">Saved value</span>}</span>
@@ -48,16 +48,16 @@ export default function MarketsTabs({ data }: { data: MarketsData }) {
       )}
     </Panel>
   );
-  const indices = <Panel title="Indices" sub="Daily change of benchmark indices, by region" source="FMP"><Bars items={data.indices} mode="chg" /></Panel>;
-  const commodities = <Panel title="Commodities" sub="Metals and energy, daily change in US dollars" source="FMP"><Bars items={data.commodities} mode="chg" decimals={2} /></Panel>;
+  const indices = <Panel title="Indices" sub="Daily change of benchmark indices, by region" source="FMP">{data.indices.length ? <Bars items={data.indices} mode="chg" /> : <Empty>Index data is unavailable right now.</Empty>}</Panel>;
+  const commodities = <Panel title="Commodities" sub="Metals and energy, daily change in US dollars" source="FMP">{data.commodities.length ? <Bars items={data.commodities} mode="chg" decimals={2} /> : <Empty>Commodity prices are unavailable right now.</Empty>}</Panel>;
   const stocks = (
-    <Panel title="Stocks" sub="The tickers in Sentiment, grouped by sector" source="FMP · Finnhub">
-      <ul>{STOCKS.map(([t, sec]) => (<li key={t} className="flex items-center justify-between py-1.5 text-sm"><span><b className="font-mono">{t}</b> <span className="text-xs text-muted">{sec}</span></span><span className="text-xs text-muted">Awaiting feed</span></li>))}</ul>
-      <p className="note mt-3">Stock quotes arrive with the Sentiment engine. Nothing is estimated until then.</p>
+    <Panel title="Stocks" sub="The tickers in Sentiment, grouped by sector" source="Finnhub">
+      {data.stocks.length ? <Bars items={data.stocks} mode="chg" /> : <Empty>Stock quotes are unavailable right now.</Empty>}
+      <p className="note mt-3">Prices in US dollars. Quotes can be delayed.</p>
     </Panel>
   );
-  const fx = <Panel title="Currencies" sub="Daily change of the main pairs, majors first" source="FMP"><Bars items={data.fx} mode="chg" decimals={4} /></Panel>;
-  const strength = <Panel title="Currency strength" sub="The dollar and the most traded currencies, one by one" source="FMP"><StrengthGrid data={data.strength} /></Panel>;
+  const fx = <Panel title="Currencies" sub="Daily change of the main pairs, majors first" source="FMP">{data.fx.length ? <Bars items={data.fx} mode="chg" decimals={4} /> : <Empty>Currency data is unavailable right now.</Empty>}</Panel>;
+  const strength = <Panel title="Currency strength" sub="The dollar and the most traded currencies, one by one" source="FMP">{data.strength.length ? <StrengthGrid data={data.strength} /> : <Empty>Currency strength is unavailable right now.</Empty>}</Panel>;
   const options = <Panel title="Options" sub="Bullish or bearish: overall and by market" source="Source to be confirmed"><OptionsGauge data={NO_OPTIONS} /></Panel>;
 
   return (
@@ -92,9 +92,9 @@ export default function MarketsTabs({ data }: { data: MarketsData }) {
             <p className="note">Yields show two decimals once the feed is connected. FRED data arrives with about one day of delay.</p>
           </div>
         )}
-        {tab === "indices" && <div className="space-y-5">{indices}<p className="note">A few indices need a paid data plan and show as unavailable instead of an estimate.</p></div>}
+        {tab === "indices" && <div className="space-y-5">{indices}<p className="note">Only indices with live data are listed.</p></div>}
         {tab === "currencies" && <div className="space-y-5">{strength}{fx}</div>}
-        {tab === "commodities" && <div className="space-y-5">{commodities}<p className="note">Gold, silver, platinum and copper are metals. Oil and gas are energy. Prices are futures-style benchmark quotes. Any the data plan does not cover show as unavailable instead of an estimate.</p></div>}
+        {tab === "commodities" && <div className="space-y-5">{commodities}<p className="note">Gold, silver, platinum and copper are metals. Oil and gas are energy. Prices are futures-style benchmark quotes. Only instruments with live data are listed.</p></div>}
         {tab === "stocks" && stocks}
         {tab === "options" && (
           <div className="space-y-5">{options}
@@ -105,7 +105,7 @@ export default function MarketsTabs({ data }: { data: MarketsData }) {
             </section>
           </div>
         )}
-        {tab === "heatmap" && <Panel title="Heatmap" sub={`A visual overview of the ${HUB_COUNT_WORD} centres`} source="FMP"><Heat indices={data.indices} fx={data.fx} yields={data.yields} commodities={data.commodities} /></Panel>}
+        {tab === "heatmap" && <Panel title="Heatmap" sub="Today’s moves at a glance. Swipe or use the arrows to change view." source="FMP · Finnhub"><Heat indices={data.indices} fx={data.fx} commodities={data.commodities} stocks={data.stocks} /></Panel>}
         {tab === "sessions" && <Sessions />}
       </div>
     </div>
