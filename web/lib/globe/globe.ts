@@ -103,6 +103,7 @@ export class Globe{
     c.addEventListener('pointerdown',e=>{ this.drag=true; lx=e.clientX; ly=e.clientY; moved=0; c.setPointerCapture(e.pointerId); c.classList.add('drag'); this.ty=null; });
     c.addEventListener('pointermove',e=>{
       const r=c.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+      this.mx=mx; this.my=my;
       if(this.drag){ this.hover=null; const dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY; moved+=Math.abs(dx)+Math.abs(dy);
         this.yaw -= dx/(this.R)*0.9; this.vel=-dx/(this.R)*0.9; this.pitch=Math.max(-1.25,Math.min(.8,this.pitch+dy/this.R*.6)); this.idle=300; }
       else this.hover=this.pick(mx,my);
@@ -111,7 +112,7 @@ export class Globe{
     const up=e=>{ if(!this.drag) return; this.drag=false; c.classList.remove('drag');
       if(moved<5){ const r=c.getBoundingClientRect(), h=this.pick(e.clientX-r.left,e.clientY-r.top); if(h) this.o.onPick(h); } };
     c.addEventListener('pointerup',up); c.addEventListener('pointercancel',()=>{this.drag=false;c.classList.remove('drag');});
-    c.addEventListener('pointerleave',()=>{this.hover=null;});
+    c.addEventListener('pointerleave',()=>{this.hover=null; this.mx=null;});
   }
   pick(mx,my){
     let best=null, bd=18;
@@ -178,6 +179,7 @@ export class Globe{
       }
     };
     draw(sea,false); draw(landPts,true);
+    if(this.o.layers) this.o.layers.draw(this,t,R,P);
     // markers
     if(this.o.markers){
       for(const h of HUBS){
@@ -205,6 +207,7 @@ export class Globe{
         if(p.z>.02) this.card(this.ch,this.cx+p.x*R,this.cy-p.y*R,t,P,this.ca);
       }
     }
+    if(this.o.layers) this.o.layers.label(this,x,P);
   }
 }
 

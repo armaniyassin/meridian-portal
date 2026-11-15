@@ -16,6 +16,7 @@ const palette = () => isDark()
 export default function GlobeStage() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const globe = useRef<GlobeLike | null>(null);
+  const layersEl = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState("lon");
   const [now, setNow] = useState<number | null>(null);
 
@@ -32,9 +33,12 @@ export default function GlobeStage() {
       if (!alive || !canvas.current) return;
       window.__pal = palette;
       window.__sans = getComputedStyle(document.body).fontFamily;
+      const { GlobeLayers } = await import("@/lib/globe/layers");
+      if (!alive || !layersEl.current) return;
+      const GL = new GlobeLayers(layersEl.current, { active: () => !document.hidden });
       const lonHome = Math.max(-170, Math.min(170, -new Date().getTimezoneOffset() / 4));
       const g = new Globe(canvas.current, {
-        interactive: true, markers: true, auto: 0.0014, yaw: lonHome * RAD, pitch: 0.3, cx: 0.5,
+        interactive: true, markers: true, layers: GL, auto: 0.0014, yaw: lonHome * RAD, pitch: 0.3, cx: 0.5,
         R: (w: number, h: number) => Math.min(w * 0.3, h * 0.37, 360),
         cyPx: (_R: number, _w: number, h: number) => h * 0.52,
         fp: (lat: number) => Math.max(-0.9, Math.min(0.9, lat * RAD * 0.8)),
@@ -74,6 +78,17 @@ export default function GlobeStage() {
     <>
       <div className="gcanvas">
         <canvas ref={canvas} role="img" aria-label={`Interactive globe of ${HUB_COUNT_WORD} financial centres. Drag to rotate, or select a marker to see its status.`} />
+        <div className="layers" id="layers" ref={layersEl}>
+          <button type="button" className="lyr-handle" id="lyrHandle" aria-label="Globe layers: satellites, internet cables, air traffic" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z" /><path d="m3 13 9 5 9-5" /></svg>
+          </button>
+          <div className="lyr-list"><div className="lyr-card" role="group" aria-label="Globe layers" aria-live="polite">
+            <button type="button" className="lyr" role="switch" aria-checked="false" data-layer="sat"><i className="sw sat" aria-hidden="true" /><span className="t"><b>Satellites</b><small data-status="sat">Orbiting now</small></span><span className="tg" aria-hidden="true" /></button>
+            <button type="button" className="lyr" role="switch" aria-checked="false" data-layer="cab"><i className="sw cab" aria-hidden="true" /><span className="t"><b>Internet cables</b><small data-status="cab">Long-haul systems highlighted</small></span><span className="tg" aria-hidden="true" /></button>
+            <button type="button" className="lyr" role="switch" aria-checked="false" data-layer="air"><i className="sw air" aria-hidden="true" /><span className="t"><b>Air traffic</b><small data-status="air">Live positions</small></span><span className="tg" aria-hidden="true" /></button>
+            <p className="lyr-src" id="lyrSrc" hidden />
+          </div></div>
+        </div>
       </div>
       <div className="hubbar">
         <div className="hubnav" aria-live="polite">

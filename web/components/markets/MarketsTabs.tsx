@@ -5,6 +5,7 @@ import type { Kind } from "@/lib/periods";
 import { PERIODS } from "@/lib/periods";
 import RotaryKnob from "@/components/markets/RotaryKnob";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePerf } from "@/components/markets/usePerf";
 import InstrumentDialog, { type Selection } from "@/components/markets/InstrumentDialog";
 import Bars from "@/components/markets/Bars";
@@ -107,6 +108,9 @@ export default function MarketsTabs({ data, initial = "overview" }: { data: Mark
   const [tab, setTab] = useState<Tab>(initial);
   const home = tab === "overview";
   const [sel, setSel] = useState<Selection | null>(null);
+  const router = useRouter();
+  /** A click goes to the instrument's own page (/markets/NVDA, /indicators/us-cpi) when one exists; otherwise the quick chart opens. */
+  const open = (s: Selection) => { if (s.item.href) router.push(s.item.href); else setSel(s); };
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const onKey = (e: React.KeyboardEvent, i: number) => {
@@ -123,11 +127,11 @@ export default function MarketsTabs({ data, initial = "overview" }: { data: Mark
       {vix.value == null ? <span className="text-xs text-muted">{vix.reason}</span> : <span className="font-mono tabular-nums">{vix.value.toFixed(2)}<span className="ml-1 text-xs text-muted">{vix.date}</span></span>}
     </p>
   );
-  const bonds = <PeriodPanel title="Bonds" sub="Yield and change, in basis points" group="bonds" kind="bond" mode="yield" items={data.yields} empty="Yields are unavailable right now." after={vixRow} href={home ? "/markets/bonds" : undefined} limit={home ? 5 : undefined} pick={["US 2-year Treasury", "US 10-year Treasury", "Germany 10-year Bund", "UK 10-year gilt", "Japan 10-year JGB"]} onSelect={setSel} />;
-  const indices = <PeriodPanel title="Indices" sub="Benchmark indices, by region" group="indices" href={home ? "/markets/indices" : undefined} limit={home ? 5 : undefined} kind="index" items={data.indices} empty="Index data is unavailable right now." onSelect={setSel} />;
-  const commodities = <PeriodPanel title="Commodities" sub="Metals and energy, in US dollars" group="commodities" href={home ? "/markets/commodities" : undefined} limit={home ? 5 : undefined} kind="commodity" items={data.commodities} decimals={2} empty="Commodity prices are unavailable right now." onSelect={setSel} />;
-  const stocks = <PeriodPanel title="Stocks" sub="The tickers in Sentiment, by sector" group="stocks" href={home ? "/markets/stocks" : undefined} limit={home ? 6 : undefined} kind="stock" items={data.stocks} empty="Stock quotes are unavailable right now." foot="Prices in US dollars. Quotes can be delayed." onSelect={setSel} />;
-  const fx = <PeriodPanel title="Currencies" sub="Change of the main pairs, majors first" group="fx" href={home ? "/markets/currencies" : undefined} limit={home ? 6 : undefined} kind="fx" items={data.fx} decimals={4} empty="Currency data is unavailable right now." onSelect={setSel} />;
+  const bonds = <PeriodPanel title="Bonds" sub="Yield and change, in basis points" group="bonds" kind="bond" mode="yield" items={data.yields} empty="Yields are unavailable right now." after={vixRow} href={home ? "/markets/bonds" : undefined} limit={home ? 5 : undefined} pick={["US 2-year Treasury", "US 10-year Treasury", "Germany 10-year Bund", "UK 10-year gilt", "Japan 10-year JGB"]} onSelect={open} />;
+  const indices = <PeriodPanel title="Indices" sub="Benchmark indices, by region" group="indices" href={home ? "/markets/indices" : undefined} limit={home ? 5 : undefined} kind="index" items={data.indices} empty="Index data is unavailable right now." onSelect={open} />;
+  const commodities = <PeriodPanel title="Commodities" sub="Metals and energy, in US dollars" group="commodities" href={home ? "/markets/commodities" : undefined} limit={home ? 5 : undefined} kind="commodity" items={data.commodities} decimals={2} empty="Commodity prices are unavailable right now." onSelect={open} />;
+  const stocks = <PeriodPanel title="Stocks" sub="The tickers in Sentiment, by sector" group="stocks" href={home ? "/markets/stocks" : undefined} limit={home ? 6 : undefined} kind="stock" items={data.stocks} empty="Stock quotes are unavailable right now." foot="Prices in US dollars. Quotes can be delayed." onSelect={open} />;
+  const fx = <PeriodPanel title="Currencies" sub="Change of the main pairs, majors first" group="fx" href={home ? "/markets/currencies" : undefined} limit={home ? 6 : undefined} kind="fx" items={data.fx} decimals={4} empty="Currency data is unavailable right now." onSelect={open} />;
   const strength = <StrengthPanel data={data.strength} />;
   const macro = <MacroPanel data={data.macro} home={home} />;
   const options = <Panel title="Options" sub="Bullish or bearish: overall and by market"><OptionsGauge data={NO_OPTIONS} /></Panel>;

@@ -30,6 +30,7 @@ export default function NavLinks() {
         </button>
         <div className="mm" role="menu">
           <Link href="/insights" role="menuitem">Insights<small>Plain-language explainers on how finance works.</small></Link>
+          <Link href="/pricing" role="menuitem">Plans<small>What is free and what Pro will add.</small></Link>
           <Link href="/brief" role="menuitem">Weekly brief<small>A Sunday macro summary at your level.</small></Link>
           <Link href="/#disclosures" role="menuitem">Disclosures<small>What this site is and what it is not.</small></Link>
         </div>

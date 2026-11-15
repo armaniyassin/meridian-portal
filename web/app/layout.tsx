@@ -6,13 +6,17 @@ import Header from "@/components/Header";
 import PageEffects from "@/components/PageEffects";
 import Popups from "@/components/Popups";
 import Toaster from "@/components/Toaster";
+import AuthDialog from "@/components/auth/AuthDialog";
 import { HUB_COUNT_WORD } from "@/lib/hubs";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const sans = Inter_Tight({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Meridian Global Macro",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  openGraph: { siteName: SITE_NAME, type: "website" },
   description: `Bonds, currencies, indices and AI sentiment across ${HUB_COUNT_WORD} financial centres. Educational information only.`,
 };
 
@@ -29,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main" tabIndex={-1}>{children}</main>
         <PageEffects />
         <Popups />
+        <AuthDialog />
         <Toaster />
       </body>
     </html>

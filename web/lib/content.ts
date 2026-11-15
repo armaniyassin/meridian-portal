@@ -42,7 +42,17 @@ export const ARTICLES: Article[] = [
 export const QUOTES: { q: string; w: string; n: string }[] = [
  {q:'Be fearful when others are greedy, and be greedy when others are fearful.',w:'Warren Buffett',n:'Investor, 2008'},
  {q:'The investor\'s chief problem, and even his worst enemy, is likely to be himself.',w:'Benjamin Graham',n:'The Intelligent Investor'},
- {q:'Know what you own, and know why you own it.',w:'Peter Lynch',n:'Attributed'}
+ {q:'Know what you own, and know why you own it.',w:'Peter Lynch',n:'Attributed'},
+ {q:'Price is what you pay. Value is what you get.',w:'Warren Buffett',n:'Letter to shareholders'},
+ {q:'The stock market is a device for transferring money from the impatient to the patient.',w:'Warren Buffett',n:'Attributed'},
+ {q:'Never invest in a business you cannot understand.',w:'Warren Buffett',n:'Attributed'},
+ {q:'Risk comes from not knowing what you are doing.',w:'Warren Buffett',n:'Attributed'},
+ {q:'The four most dangerous words in investing are: this time it is different.',w:'John Templeton',n:'Attributed'},
+ {q:'In the short run the market is a voting machine, in the long run a weighing machine.',w:'Benjamin Graham',n:'Attributed'},
+ {q:'Diversification is the only free lunch in investing.',w:'Harry Markowitz',n:'Attributed'},
+ {q:'The big money is not in the buying and selling, but in the waiting.',w:'Charlie Munger',n:'Attributed'},
+ {q:'It is not whether you are right or wrong, but how much you make when right and lose when wrong.',w:'George Soros',n:'Attributed'},
+ {q:'Investing should be more like watching paint dry or watching grass grow.',w:'Paul Samuelson',n:'Attributed'}
 ];
 export const artById = (id: string) => ARTICLES.find((a) => a.id === id);
 export const CATS = ['All', 'Bonds', 'Equities', 'FX', 'Macro', 'Basics'];

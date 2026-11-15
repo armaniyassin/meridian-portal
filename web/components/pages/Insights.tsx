@@ -14,7 +14,7 @@ export function InsightCard({ id, cat, read, v, t, lede }: { id: string; cat: st
 }
 
 /** Insights: short plain-language explainers and words from investors. More will be added here over time. */
-export default function Insights() {
+export default function Insights({ embedded = false }: { embedded?: boolean }) {
   const [cat, setCat] = useState("All");
   const [q, setQ] = useState(0);
   useEffect(() => {
@@ -25,11 +25,13 @@ export default function Insights() {
   const list = ARTICLES.filter((a) => cat === "All" || a.cat === cat);
   const Q = QUOTES[q];
   return (
-    <div className="wrap pg">
+    <div className={embedded ? "wrap" : "wrap pg"} style={embedded ? { paddingTop: 56 } : undefined}>
     <section id="insights" aria-labelledby="insights-h">
       <div className="pg-h">
         <div className="eyebrow">Insights</div>
-        <h1 id="insights-h" className="two fx">Understand it first. <span className="dim">Then study it.</span></h1>
+        {embedded
+          ? <h2 id="insights-h" className="two fx">Understand it first. <span className="dim">Then study it.</span></h2>
+          : <h1 id="insights-h" className="two fx">Understand it first. <span className="dim">Then study it.</span></h1>}
         <p className="lede">Short, plain-language explainers on how finance and trading work, and words from great investors. A good place to start before the Academy lessons.</p>
       </div>
       <div className="sh rv">
