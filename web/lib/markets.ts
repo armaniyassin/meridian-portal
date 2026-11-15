@@ -1,6 +1,7 @@
 import "server-only";
-import { getFred, FRED_SERIES, type FredPoint } from "@/lib/fred";
+import { getFred, FRED_SERIES, INTL_BONDS, MACRO, type FredPoint } from "@/lib/fred";
 import { getQuote, type Quote } from "@/lib/fmp";
+import { getSkew, getMove } from "@/lib/volindex";
 import { getStockQuote } from "@/lib/finnhub";
 import type { Cached } from "@/lib/cache";
 
@@ -43,6 +44,11 @@ export async function getMarketSnapshot() {
   const yields: Row<FredPoint>[] = [];
   for (const id of Object.keys(FRED_SERIES) as (keyof typeof FRED_SERIES)[])
     yields.push(await safe(FRED_SERIES[id], id, id === "VIXCLS" ? "Volatility" : "US Treasuries", getFred(id)));
+  // Other countries' 10-year yields and the macro indicators: FRED allows many calls, results are cached, so these run in parallel.
+  const intl = await Promise.all(INTL_BONDS.map(([id, label, group]) => safe(label, id, group, getFred(id, 6 * 3600))));
+  const macro = await Promise.all(MACRO.map((m) => safe(m.label, m.id, m.group, getFred(m.id, m.id === "VIXCLS" || m.id === "DFF" || m.id.startsWith("T1") || m.id === "BAMLH0A0HYM2" ? 3600 : 6 * 3600))));
+  // MOVE and SKEW are not on FRED: SKEW comes from CBOE's own CSV, MOVE from a public chart endpoint (see lib/volindex.ts). A failure leaves the row out.
+  const extraQuotes = await Promise.all([safe("MOVE bond volatility", "MOVE", "Volatility and credit", getMove()), safe("SKEW tail-risk index", "SKEW", "Volatility and credit", getSkew())]);
   const indices: Row<Quote>[] = [];
   for (const [sym, label, region] of INDICES) indices.push(await safe(label, sym, region, getQuote(sym)));
   const fx: Row<Quote>[] = [];
@@ -51,7 +57,7 @@ export async function getMarketSnapshot() {
   for (const [sym, label, group] of COMMODITIES) commodities.push(await safe(label, sym, group, getQuote(sym)));
   const stocks: Row<Quote>[] = [];
   for (const [sym, sector] of STOCKS) stocks.push(await safe(sym, sym, sector, getStockQuote(sym)));
-  return { yields, indices, fx, commodities, stocks, generatedAt: new Date().toISOString() };
+  return { yields, intl, macro, extraQuotes, indices, fx, commodities, stocks, generatedAt: new Date().toISOString() };
 }
 
 /** Just the stock tickers (Sentiment watchlist). Cached for 10 minutes per ticker. */
