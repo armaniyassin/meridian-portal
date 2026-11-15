@@ -24,3 +24,10 @@ Working: header (hides on scroll down, returns on scroll up; no clock), hero wit
 
 ## Rules to keep
 Never invent market data or news. English site. One font family. No clock/hour anywhere. No round surroundings in the header. "Inspired by CFA-level curriculum" only, never the CFA mark.
+
+## Globe layers (15 Nov 2026)
+Hover control (bottom-right of the home globe, faint until hover/focus) with three opt-in switches: Satellites, Internet cables (long-haul systems highlighted), Air traffic. Code: `src/segments/seg_layers.js`; hooks in `Globe.frame`, `PortalData.setSatellites/setCables/setAircraft`.
+- Nothing is requested until a switch is turned on. Failures show the last real snapshot with its UTC time, or "Unavailable right now". No placeholder data.
+- Sources: CelesTrak GP (satellites; positions computed from mean elements, approximate), TeleGeography cable map (cables; "highlighted" = systems of 6,000 km or more on the map geometry), OpenSky Network (aircraft; dead-reckoned between 120 s refreshes).
+- Feeds go through `server.mjs` (same-origin `/api/satellites|cables|aircraft`, cached on disk, serves the last real snapshot flagged stale if upstream fails). Checked from a real browser: CelesTrak answers with CORS; OpenSky and TeleGeography send NO CORS headers, so a direct browser call is impossible. Response shapes of cables/aircraft are still untested against the live feeds (sandbox had no access); run `node server.mjs` and check the console on first use.
+- Before launch (Dept 06/07): TeleGeography data is CC BY-NC-SA (commercial use needs their data licence); OpenSky is non-commercial unless licensed and anonymous access is 400 credits/day (a global call costs 4); CelesTrak asks for one download per 2 h update cycle. Move all three behind our own Supabase-cached route and point `LAYER_SOURCES[*].url` at it.

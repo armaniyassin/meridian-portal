@@ -12,6 +12,9 @@ $('#thDark').onclick=()=>setTheme('dark'); $('#thLight').onclick=()=>setTheme('l
 /* ================= data adapter: the page never invents values ================= */
 const store = {};
 window.PortalData = { set(id, patch){ store[id]=Object.assign(store[id]||{},patch); $('#feedState').textContent='connected'; refreshPage(); } };
+/* globe layers adapters: push real data from our own backend instead of the public feeds */
+// PortalData.setSatellites(ommJsonArray) · PortalData.setCables(geoJson) · PortalData.setAircraft(openSkyStatesResponse)
+Object.assign(window.PortalData,{ setSatellites:d=>GL.ingest('sat',d), setCables:d=>GL.ingest('cab',d), setAircraft:d=>GL.ingest('air',d) });
 const fmtPct = v => v==null?'—':Number(v).toFixed(2);
 const fmtFx  = v => v==null?'—':Number(v).toFixed(4);
 const fmtIdx = v => v==null?'—':Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -24,7 +27,8 @@ const rowsT=[['AAPL','Technology'],['MSFT','Technology'],['NVDA','Technology'],[
 
 /* ================= globes ================= */
 const lonHome = Math.max(-170,Math.min(170,-new Date().getTimezoneOffset()/4));
-const g1 = new Globe($('#globe'), {interactive:true, markers:true, auto:.0014, yaw:lonHome*RAD, pitch:.3, cx:.5, R:(w,h)=>Math.min(w*.3,h*.37,360), cyPx:(R,w,h)=>h*.52, fp:lat=>Math.max(-.9,Math.min(.9,lat*RAD*.8)), onPick:h=>select(h.id)});
+const GL = new GlobeLayers($('#layers'), {active:()=>page==='home'&&!document.hidden});
+const g1 = new Globe($('#globe'), {interactive:true, markers:true, layers:GL, auto:.0014, yaw:lonHome*RAD, pitch:.3, cx:.5, R:(w,h)=>Math.min(w*.3,h*.37,360), cyPx:(R,w,h)=>h*.52, fp:lat=>Math.max(-.9,Math.min(.9,lat*RAD*.8)), onPick:h=>select(h.id)});
 addEventListener('resize',()=>{ g1.resize(); moveInd(); });
 function select(id,noFocus){ current=id; g1.active=id; const h=byId[id]; if(!noFocus){ g1.focus(h.lon,h.lat);} drawHubInfo(); }
 function cycle(d){ const i=HUBS.findIndex(h=>h.id===current); select(HUBS[(i+d+HUBS.length)%HUBS.length].id); }
@@ -306,7 +310,7 @@ function drawSent(){
   const sec=SECTORS()[secIdx]||'All sectors';
   $('#secC').textContent=sec; $('#sortC').textContent='Sorted by '+(sortKey==='ticker'?'ticker':'sector');
   let list=rowsT.filter(r=>secIdx===0||r.s===sec); list=[...list].sort((a,b)=>sortKey==='ticker'?a.t.localeCompare(b.t):a.s.localeCompare(b.s)||a.t.localeCompare(b.t));
-  $('#wl').innerHTML=list.map(r=>`<tr data-t="${r.t}" class="${r.hl?'hl':''}"><td><span class="logo">${r.t[0]}</span>${r.t}</td><td><span class="sect">${r.s}</span></td><td class="mono" style="color:var(--muted)">P/E — · EBITDA —</td>
+  $('#wl').innerHTML=list.map(r=>`<tr data-t="${r.t}" class="${r.hl?'hl':''}"><td class="clk" tabindex="0" role="button" style="cursor:pointer" aria-label="${r.t}: open chart and fundamentals"><span class="logo">${r.t[0]}</span>${r.t}</td><td><span class="sect">${r.s}</span></td><td class="mono" style="color:var(--muted)">P/E — · EBITDA —</td>
    <td>${r.state==='idle'?`<button class="run" data-run="${r.t}">Run report</button>`:`<span class="tag closed">Awaiting engine</span>`}</td></tr>`).join('');
   const L=lastRun;
   $('#report').innerHTML=`<div class="top"><div><div style="font-size:11px;color:var(--muted)">${L?'Report':'Report preview'}</div><div style="font-family:var(--serif);font-size:26px;font-weight:700">${L||'Ticker'}</div></div><span class="tag ${L?'closed':'ai'}">${L?'Awaiting engine':'AI'}</span></div>
@@ -328,8 +332,10 @@ function ask(){
   rowsT.forEach(x=>x.hl=false); r.hl=true; secIdx=0; $('#ticker').value=''; drawSent(); runReport(v);
 }
 $('#askGo').onclick=ask; $('#ticker').addEventListener('keydown',e=>{ if(e.key==='Enter') ask(); });
+$('#p-sentiment').addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' ') return; const tk=e.target.closest('#wl td.clk'); if(tk&&e.target===tk){ e.preventDefault(); openDetail(tk.parentNode.dataset.t,'stock',tk); } });
 $('#p-sentiment').addEventListener('click',e=>{
   const run=e.target.closest('[data-run]'); if(run){ runReport(run.dataset.run); return; }
+  const tk=e.target.closest('#wl td.clk'); if(tk){ openDetail(tk.parentNode.dataset.t,'stock',tk); return; }
   if(e.target.closest('#sortC')){ sortKey=sortKey==='ticker'?'sector':'ticker'; drawSent(); }
   if(e.target.closest('#secC')){ secIdx=(secIdx+1)%SECTORS().length; drawSent(); }
 });

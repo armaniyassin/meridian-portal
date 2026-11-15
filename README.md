@@ -6,8 +6,9 @@ Single self-contained HTML (vanilla JS/CSS, Inter Tight + Geist Mono from Google
 ## Run
 ```
 python3 build.py        # writes dist/index.html
-open dist/index.html    # or double-click it
+node server.mjs         # serves it at http://localhost:3100 with the cached globe-layer feeds
 ```
+Opening dist/index.html directly (file://) works for everything except the live globe layers, which need the server.
 Layout: `src/template.html` (markup + CSS, with //@@HUBS@@ //@@TIME@@ //@@GEO@@ //@@APP@@ placeholders), `src/app.js` (router, home globe, pages, popups, heatmap), `src/segments/` (hubs, exchange hours, land polygons + Globe class).
 
 ## Golden rules (from the project's CLAUDE.md)

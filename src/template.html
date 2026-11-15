@@ -35,10 +35,6 @@ a{color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
 svg{display:block}
-.rails{position:fixed;inset:0;pointer-events:none;z-index:0}
-.rails::before,.rails::after{content:"";position:absolute;top:0;bottom:0;border-left:1px dashed var(--line)}
-.rails::before{left:max(16px,calc(50% - 600px))}
-.rails::after{right:max(16px,calc(50% - 600px))}
 
 /* ---------- header ---------- */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:70;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
@@ -114,11 +110,32 @@ h2{font-size:clamp(32px,4.6vw,56px);line-height:1.05}
 .tag.closed{background:var(--surface2);color:var(--muted)}
 .tag.ai{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
 .hint{position:absolute;z-index:3;left:0;right:0;bottom:10px;text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em;pointer-events:none}
+/* globe layers: invisible-until-hover control, bottom right of the globe stage */
+.layers{position:absolute;z-index:4;right:max(28px,calc(50% - 572px));top:120px;display:flex;flex-direction:column;align-items:flex-end}
+.lyr-handle{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--muted);display:grid;place-items:center;opacity:.5;transition:opacity .25s,color .25s,border-color .25s}
+.layers:hover .lyr-handle,.layers:has(:focus-visible) .lyr-handle,.layers.open .lyr-handle{opacity:1;color:var(--text);border-color:var(--accent)}
+.lyr-list{padding-top:8px;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .22s,transform .22s}
+.layers:hover .lyr-list,.layers:has(:focus-visible) .lyr-list,.layers.open .lyr-list{opacity:1;transform:none;pointer-events:auto}
+.lyr-card{width:272px;max-width:calc(100vw - 40px);background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:6px}
+.lyr{display:flex;align-items:center;gap:11px;width:100%;min-height:44px;padding:6px 10px;border:0;border-radius:9px;background:none;color:var(--text);text-align:left;transition:background .2s}
+.lyr:hover{background:color-mix(in srgb,var(--text) 7%,transparent)}
+.lyr .t{flex:1;min-width:0;display:grid;gap:1px}
+.lyr b{font-weight:600;font-size:13px}
+.lyr small{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.01em;white-space:normal;line-height:1.35}
+.sw{flex:none;width:8px;height:8px;border-radius:50%}
+.sw.sat{background:var(--text)} .sw.cab{background:var(--accent)} .sw.air{background:#e9b768}
+.tg{flex:none;position:relative;width:28px;height:16px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);transition:background .2s,border-color .2s}
+.tg::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.lyr[aria-checked="true"] .tg{background:color-mix(in srgb,var(--accent) 28%,transparent);border-color:var(--accent)}
+.lyr[aria-checked="true"] .tg::after{transform:translateX(12px);background:var(--accent)}
+.lyr-src{margin:4px 10px 6px;padding-top:7px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.02em}
+@media (prefers-reduced-motion:reduce){.lyr-list,.lyr-handle,.tg,.tg::after{transition:none}}
 @media (max-width:900px){
   .hero{height:auto;display:flex;flex-direction:column;padding-top:76px}
   .gcanvas{position:relative;inset:auto;height:min(92vw,460px);order:1}
   .copy{position:relative;left:auto;bottom:auto;order:2;padding:6px 20px 16px;max-width:none}
   .hubbar{position:relative;bottom:auto;order:3;padding-bottom:6px}
+  .layers{right:14px;top:8px}
   .hint{position:relative;bottom:auto;order:4;padding:0 0 20px}
 }
 
@@ -470,7 +487,6 @@ blockquote{font-size:clamp(24px,3.6vw,42px);line-height:1.12;letter-spacing:-.03
 </style>
 </head>
 <body>
-<div class="rails" aria-hidden="true"></div>
 
 <header class="hdr" id="hdr">
   <div class="hdr-in">
@@ -509,7 +525,16 @@ blockquote{font-size:clamp(24px,3.6vw,42px);line-height:1.12;letter-spacing:-.03
 <section class="page" id="p-home" data-page="home">
   <div class="hero" id="hero">
     <div class="glow"></div>
-    <div class="gcanvas"><canvas id="globe" role="img" aria-label="Interactive globe of eleven financial centres. Drag to rotate; select a marker to see its status."></canvas></div>
+    <div class="gcanvas"><canvas id="globe" role="img" aria-label="Interactive globe of eleven financial centres. Drag to rotate; select a marker to see its status."></canvas>
+      <div class="layers" id="layers">
+        <button type="button" class="lyr-handle" id="lyrHandle" aria-label="Globe layers: satellites, internet cables, air traffic" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 17l9 5 9-5" opacity=".55"/></svg></button>
+        <div class="lyr-list"><div class="lyr-card" role="group" aria-label="Globe layers" aria-live="polite">
+          <button type="button" class="lyr" role="switch" aria-checked="false" data-layer="sat"><i class="sw sat" aria-hidden="true"></i><span class="t"><b>Satellites</b><small data-status="sat">Orbiting now</small></span><span class="tg" aria-hidden="true"></span></button>
+          <button type="button" class="lyr" role="switch" aria-checked="false" data-layer="cab"><i class="sw cab" aria-hidden="true"></i><span class="t"><b>Internet cables</b><small data-status="cab">Long-haul systems highlighted</small></span><span class="tg" aria-hidden="true"></span></button>
+          <button type="button" class="lyr" role="switch" aria-checked="false" data-layer="air"><i class="sw air" aria-hidden="true"></i><span class="t"><b>Air traffic</b><small data-status="air">Live positions</small></span><span class="tg" aria-hidden="true"></span></button>
+          <p class="lyr-src" id="lyrSrc" hidden></p>
+        </div></div>
+      </div></div>
     <div class="copy">
       <svg class="mark" width="46" height="46" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="14" cy="14" r="11"/><ellipse cx="14" cy="14" rx="4.6" ry="11"/><path d="M3.5 10.5h21M3.5 17.5h21"/></svg>
       <h1>Meridian</h1>
@@ -745,6 +770,7 @@ const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 //@@HUBS@@
 //@@TIME@@
 //@@GEO@@
+//@@LAYERS@@
 //@@APP@@
 })();
 </script>
