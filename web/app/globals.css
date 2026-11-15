@@ -71,7 +71,7 @@ svg{display:block}
 .copy{position:absolute;z-index:3;left:max(28px,calc(50% - 572px));bottom:92px;max-width:600px;pointer-events:none}
 .copy .cta,.copy .cta a{pointer-events:auto}
 .mark{margin-bottom:22px;color:var(--text)}
-.hero h1{font-size:clamp(64px,10vw,152px);line-height:.88;letter-spacing:-.055em;font-weight:600;margin:0}
+.hero h1{font-size:clamp(56px,min(10vw,15svh),152px);line-height:.88;letter-spacing:-.055em;font-weight:600;margin:0}
 .tagline{font-size:clamp(20px,2.3vw,32px);line-height:1.1;font-weight:600;letter-spacing:-.03em;margin:20px 0 12px}
 .hero .sub{color:var(--muted);font-size:14px;line-height:1.5;max-width:46ch;margin:0 0 20px;text-wrap:pretty}
 .cta{display:flex;gap:8px;flex-wrap:wrap}
@@ -88,7 +88,7 @@ svg{display:block}
 .hint{position:absolute;z-index:3;left:0;right:0;bottom:10px;text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em;pointer-events:none}
 @media (max-width:900px){
   .hero{height:auto;display:flex;flex-direction:column;padding-top:76px}
-  .gcanvas{position:relative;inset:auto;height:min(92vw,460px);order:1}
+  .gcanvas{position:relative;inset:auto;height:min(86vw,38svh,460px);order:1}
   .copy{position:relative;left:auto;bottom:auto;order:2;padding:6px 20px 16px;max-width:none}
   .hubbar{position:relative;bottom:auto;order:3;padding-bottom:6px}
   .hint{position:relative;bottom:auto;order:4;padding:0 0 20px}
@@ -172,3 +172,6 @@ html{scroll-padding-top:88px} /* keeps focused elements clear of the fixed heade
 .hx-dots button{width:7px;height:7px;padding:0;border:0;border-radius:99px;background:var(--line);transition:width .35s,background .35s}
 .hx-dots button.on{width:22px;background:var(--accent)}
 @media (max-width:700px){.hx-map{aspect-ratio:auto;height:520px}.hx-tabs button{min-width:84px;padding:7px 10px}}
+
+.nudge{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:28px;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.nudge p{margin:0;font-size:14px;color:var(--text);max-width:60ch}

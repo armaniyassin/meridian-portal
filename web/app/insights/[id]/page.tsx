@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ARTICLES, artById } from "@/lib/content";
 import Vis from "@/components/Vis";
+import SignupNudge from "@/components/account/SignupNudge";
 import SaveArticleButton from "@/components/account/SaveArticleButton";
 import CopyLink from "@/components/pages/CopyLink";
 import { InsightCard } from "@/components/pages/Insights";
@@ -30,6 +31,7 @@ export default async function Article({ params }: { params: Promise<{ id: string
         {a.b.map((p) => <p key={p} className="ap">{p}</p>)}
         <div className="take"><b>Key takeaway</b><p>{a.k}</p></div>
         <div className="artact"><SaveArticleButton id={a.id} /><CopyLink /><Link className="b solid" href="/brief">Get the Sunday brief</Link></div>
+        <SignupNudge text="Want to save this article and follow the indicators it covers? Sign up free in one click." reason="to save articles and follow tickers" />
         <p className="note" style={{ marginTop: 20 }}>Educational information only. It is not financial advice or a recommendation to buy or sell any security.</p>
         <div className="sh" style={{ marginTop: 44 }}><h2 style={{ fontSize: 22 }}>Keep reading</h2></div>
         <div className="ngrid two">{rel.map((r) => <InsightCard key={r.id} {...r} />)}</div>

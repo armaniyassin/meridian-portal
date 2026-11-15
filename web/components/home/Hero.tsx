@@ -19,10 +19,10 @@ export default function Hero() {
         <p className="tagline">Institutional grade, made accessible.</p>
         <p className="sub">Meridian follows bonds, currencies, indices and AI sentiment across {HUB_COUNT_WORD} financial centres, and shows who is trading right now.</p>
         <div className="cta">
-          <Link className="b solid lg" href="/markets">Explore markets {ARROW}</Link>
-          <Link className="b lg" href="/brief">Get the weekly brief</Link>
+          <Link className="b solid lg" href="/brief">Join the brief {ARROW}</Link>
+          <Link className="b lg" href="/markets">Explore markets</Link>
         </div>
-        <p className="fine">5 free sentiment reports. Educational information only, not financial advice.</p>
+        <p className="fine"><b>Free.</b> A new macro briefing every Sunday, plus 5 free sentiment reports. Educational information only, not financial advice.</p>
       </div>
     </section>
   );

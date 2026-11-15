@@ -2,6 +2,7 @@ import Link from "next/link";
 import DisclaimerFooter from "@/components/DisclaimerFooter";
 import JsonLd from "@/components/seo/JsonLd";
 import LinkDirectory from "@/components/seo/LinkDirectory";
+import SignupNudge from "@/components/account/SignupNudge";
 import QuestionsSection from "@/components/seo/QuestionsSection";
 import FollowButton from "@/components/account/FollowButton";
 import AlertForm from "@/components/account/AlertForm";
@@ -77,6 +78,7 @@ export default async function InstrumentView({ inst }: { inst: Inst }) {
         )}
 
         <AlertForm targetType="ticker" targetSlug={inst.slug} label={inst.label} />
+        <SignupNudge text={`Want ${inst.label} on your watchlist, with alerts when it moves? Sign up free in one click.`} reason={`to follow ${inst.label}`} />
         <QuestionsSection targetType="ticker" targetSlug={inst.slug} label={inst.label} />
 
         <p className="note mt-6"><Link href="/sentiment">{inst.kind === "stock" ? "Search sentiment for a ticker →" : "Explore sentiment →"}</Link></p>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import DisclaimerFooter from "@/components/DisclaimerFooter";
 import JsonLd from "@/components/seo/JsonLd";
+import SignupNudge from "@/components/account/SignupNudge";
 import QuestionsSection from "@/components/seo/QuestionsSection";
 import AlertForm from "@/components/account/AlertForm";
 import { getFred } from "@/lib/fred";
@@ -64,6 +65,7 @@ export default async function IndicatorPage({ params }: { params: Promise<{ slug
           {c && <p className="note" style={{ margin: "8px 0 0" }}>{c.stale ? "Cached data, last refreshed " : "Updated "}<span className="font-mono">{utc(c.fetchedAt)}</span> · Source: FRED series <span className="font-mono">{ind.id}</span></p>}
         </section>
         <AlertForm targetType="indicator" targetSlug={ind.slug} label={ind.label} />
+        <SignupNudge text={`Want an alert when ${ind.label} updates? Sign up free in one click.`} reason={`to get alerts for ${ind.label}`} />
         <QuestionsSection targetType="indicator" targetSlug={ind.slug} label={ind.label} />
         {related.length > 0 && (
           <nav aria-label="Related indicators" className="card mt-6">

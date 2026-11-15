@@ -14,12 +14,13 @@ export default function DisclaimerFooter() {
             <p style={{ fontSize: 13, color: "var(--muted)", maxWidth: "30ch" }}>Global markets, sentiment and education in one place.</p>
           </div>
           <nav aria-label="Product"><h2>Product</h2><Link href="/markets">Markets</Link><Link href="/sentiment">Sentiment</Link><Link href="/academy">Academy</Link><Link href="/news">News</Link></nav>
-          <div><h2>Resources</h2><Link href="/insights">Insights</Link><Link href="/brief">Weekly brief</Link><Link href="/indicators">Macro indicators</Link><span className="soon">Data sources · Coming soon</span></div>
+          <div><h2>Resources</h2><Link href="/insights">Insights</Link><Link href="/brief">Weekly brief</Link><Link href="/indicators">Macro indicators</Link><Link href="/data-sources">Data sources</Link><Link href="/pricing">Plans</Link></div>
           <div><h2>Legal</h2><span className="soon">Privacy policy · Coming soon</span><span className="soon">Terms of service · Coming soon</span></div>
         </div>
         <div className="legal">
           <p>The information and sentiment projections on this site are for educational and informational purposes only. They are not financial advice or a recommendation to buy or sell any security.</p>
           <p>Where a data provider has no value, the site shows a dash instead of an estimate. Session hours are typical hours in each exchange’s local time and do not include holidays or breaks.</p>
+          <p>Data is cached and refreshed every few minutes, and pages show when they were last updated (UTC). <Link href="/data-sources" style={{ textDecoration: "underline" }}>See every data source</Link>.</p>
         </div>
       </div>
     </footer>

@@ -8,7 +8,7 @@ const GROUPS = ["bonds", "indices", "currencies", "commodities", "stocks", "macr
 /** Only pages that carry data are listed; noindex symbols stay out. No lastModified: it would be a guess. */
 export default function sitemap(): MetadataRoute.Sitemap {
   const paths = [
-    "/", "/markets", "/sentiment", "/academy", "/news", "/insights", "/brief", "/indicators", "/pricing",
+    "/", "/markets", "/sentiment", "/academy", "/news", "/insights", "/brief", "/indicators", "/pricing", "/data-sources",
     ...GROUPS.map((g) => `/markets/${g}`),
     ...INSTRUMENTS.filter((i) => i.indexable).map((i) => `/markets/${i.slug}`),
     ...INDICATORS.map((i) => `/indicators/${i.slug}`),
